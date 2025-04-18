@@ -1,0 +1,280 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hey
+    - hello
+    - hi
+    - hello there
+    - good morning
+    - good evening
+    - hey there
+    - greetings
+    - namaste
+    - hi asha
+    - hello asha
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you around
+    - see you later
+    - take care
+    - till next time
+    - bye bye
+    - have a nice day
+    - tata
+    - farewell
+
+- intent: affirm
+  examples: |
+    - yes
+    - y
+    - indeed
+    - of course
+    - that sounds good
+    - correct
+    - sure
+    - okay
+    - yeah
+    - sounds good
+    - that's right
+    - i agree
+
+- intent: deny
+  examples: |
+    - no
+    - n
+    - never
+    - I don't think so
+    - don't like that
+    - not really
+    - nope
+    - nah
+    - not interested
+    - i disagree
+
+- intent: thanks
+  examples: |
+    - thanks
+    - thank you
+    - appreciate it
+    - thanks a lot
+    - thank you so much
+    - thanks for your help
+    - thank you asha
+    - thanks for the information
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - very good
+    - great
+    - amazing
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I'm good
+    - I'm fine
+    - doing well
+
+- intent: mood_unhappy
+  examples: |
+    - sad
+    - very sad
+    - unhappy
+    - bad
+    - very bad
+    - awful
+    - terrible
+    - not very good
+    - extremely sad
+    - so sad
+    - feeling down
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+    - who are you?
+    - what are you?
+    - what is your name?
+    - tell me about yourself
+    - introduce yourself
+    - what can you do?
+
+# Job related intents
+- intent: search_job
+  examples: |
+    - I need a job
+    - help me find a job
+    - I am looking for job opportunities
+    - show me job openings
+    - I want to search for jobs
+    - find me a job
+    - I need employment
+    - job search
+    - help me with my job search
+    - are there any job openings?
+    - I'm looking for work
+    - find me a [software developer](job_role) job
+    - I need a [marketing](job_role) position
+    - looking for [part-time](job_type) jobs
+    - I want a [full-time](job_type) job
+    - any jobs in [Bangalore](location)?
+    - jobs in [Delhi](location)
+    - looking for jobs in [Mumbai](location)
+    - I need a job in [tech](industry)
+    - job in [healthcare](industry) sector
+    - I have [2 years](experience) of experience
+    - I have [5 years](experience) experience
+    - jobs with [python](skill) requirements
+    - position requiring [project management](skill) skills
+
+- intent: provide_job_preference
+  examples: |
+    - I prefer to work in [Bangalore](location)
+    - I'm interested in [marketing](job_role)
+    - I have experience in [data science](job_role)
+    - I'm looking for [remote](job_type) positions
+    - I want to work [part-time](job_type)
+    - I have [3 years](experience) of work experience
+    - I know [Java](skill)
+    - I'm skilled in [communication](skill)
+    - I want to work in [finance](industry)
+    - I'm interested in [IT](industry) sector
+    - I'd like a job that pays at least [10 lakhs](salary)
+    - I'm looking for a salary of [15 lakhs](salary)
+    - I want to work at [Google](company)
+    - I prefer [small startups](company)
+
+- intent: list_jobs
+  examples: |
+    - list all jobs
+    - show me job openings
+    - what jobs are available
+    - display job listings
+    - what positions are open
+    - what are the current openings
+    - show all job opportunities
+    - what jobs do you have
+    - list current vacancies
+    - tell me about job openings
+
+# Session and events related intents
+- intent: ask_about_events
+  examples: |
+    - what events are happening?
+    - are there any upcoming events?
+    - tell me about community events
+    - what workshops are scheduled?
+    - when is the next event?
+    - are there any webinars coming up?
+    - tell me about networking events
+    - what career events are planned?
+    - any events for skill development?
+    - are there any events for women returning to work?
+    - upcoming events for career women
+    - when is the next [workshop](event_type)?
+    - tell me about [networking](event_type) events
+    - any [webinar](event_type) scheduled?
+
+- intent: ask_about_sessions
+  examples: |
+    - what sessions do you offer?
+    - tell me about your learning sessions
+    - how can I join a session?
+    - what types of sessions are available?
+    - do you have training sessions?
+    - tell me about skill-building sessions
+    - are there any group sessions?
+    - when are the next sessions?
+    - how do sessions work?
+    - what can I learn in these sessions?
+    - tell me about career development sessions
+
+- intent: ask_about_mentorship
+  examples: |
+    - how can I find a mentor?
+    - tell me about mentorship programs
+    - I need a career mentor
+    - how does your mentorship work?
+    - who can be my mentor?
+    - mentorship for women
+    - how can I connect with mentors?
+    - I want to get mentored
+    - what are the benefits of mentorship?
+    - how do I apply for mentorship?
+    - mentorship programs for returning professionals
+
+# Women empowerment related intents
+- intent: ask_women_empowerment
+  examples: |
+    - how do you empower women?
+    - tell me about women's empowerment initiatives
+    - what resources do you have for women?
+    - how can women advance in their careers?
+    - tell me about gender equality in the workplace
+    - how to overcome gender bias at work
+    - women leadership programs
+    - support for working mothers
+    - women in male-dominated fields
+    - initiatives for women in tech
+    - how to balance career and family as a woman
+    - success stories of women in business
+
+- intent: ask_career_advice
+  examples: |
+    - how can I advance in my career?
+    - tips for career growth
+    - how to ask for a promotion
+    - career advice for women
+    - how to return to work after a break
+    - advice for switching careers
+    - how to build my professional network
+    - tips for job interviews
+    - how to negotiate salary
+    - what skills should I develop?
+    - career path suggestions
+    - how to overcome career challenges
+
+# FAQ intents
+- intent: faq
+  examples: |
+    - what is JobsForHer?
+    - how can JobsForHer help me?
+    - is JobsForHer only for women?
+    - does JobsForHer charge any fees?
+    - how do I create an account?
+    - what resources does JobsForHer provide?
+    - how can I post my resume?
+    - how do employers use JobsForHer?
+    - does JobsForHer offer career counseling?
+    - can men use JobsForHer?
+    - what makes JobsForHer different from other job sites?
+    - how successful is JobsForHer?
+
+# Out of scope and fallback
+- intent: out_of_scope
+  examples: |
+    - what's the weather today?
+    - order me a pizza
+    - I want to book a flight
+    - who is the president of USA?
+    - tell me a joke
+    - what's the meaning of life?
+    - can you play music?
+    - what stocks should I buy?
+    - what's your favorite color?
+    - do you have a boyfriend?
+
+- intent: nlu_fallback
+  examples: |
+    - xzzzzzzzzzzzzzzzzzz
+    - asdfghjkl
+    - qwertyuiop
+    - 123456789

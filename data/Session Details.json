@@ -1,0 +1,137 @@
+[
+    {
+      "id": 1,
+      "type": "event",
+      "title": "Women in Tech Workshop",
+      "date": "May 10, 2025",
+      "time": "2:00 PM",
+      "location": "Online",
+      "description": "Learn about the latest technologies and how women are shaping the tech industry."
+    },
+    {
+      "id": 2,
+      "type": "event",
+      "title": "Resume Building Workshop",
+      "date": "May 15, 2025",
+      "time": "3:30 PM",
+      "location": "Online",
+      "description": "Learn how to create a resume that stands out and showcases your skills effectively."
+    },
+    {
+      "id": 3,
+      "type": "event",
+      "title": "Career Transition Webinar",
+      "date": "May 20, 2025",
+      "time": "6:00 PM",
+      "location": "Online",
+      "description": "Expert advice on how to successfully navigate career transitions and changes."
+    },
+    {
+      "id": 4,
+      "type": "event",
+      "title": "Networking Mixer",
+      "date": "May 25, 2025",
+      "time": "5:00 PM",
+      "location": "Online",
+      "description": "Connect with professionals from various industries and expand your network."
+    },
+    {
+      "id": 5,
+      "type": "event",
+      "title": "Leadership Skills Workshop",
+      "date": "June 1, 2025",
+      "time": "4:00 PM",
+      "location": "Online",
+      "description": "Develop essential leadership skills that will help you advance in your career."
+    },
+    {
+      "id": 6,
+      "type": "session",
+      "title": "Career Growth Strategies",
+      "date": "May 12, 2025",
+      "time": "2:00 PM",
+      "location": "Online",
+      "description": "Learn effective strategies to accelerate your career growth and advancement."
+    },
+    {
+      "id": 7,
+      "type": "session",
+      "title": "Technical Skills Update",
+      "date": "May 18, 2025",
+      "time": "3:30 PM",
+      "location": "Online",
+      "description": "Stay updated with the latest technical skills in demand in the job market."
+    },
+    {
+      "id": 8,
+      "type": "session",
+      "title": "Work-Life Balance Session",
+      "date": "May 22, 2025",
+      "time": "6:00 PM",
+      "location": "Online",
+      "description": "Tips and strategies for maintaining a healthy work-life balance."
+    },
+    {
+      "id": 9,
+      "type": "session",
+      "title": "Interviewing Skills Workshop",
+      "date": "May 28, 2025",
+      "time": "5:00 PM",
+      "location": "Online",
+      "description": "Master the art of interviewing with practical tips and mock interview sessions."
+    },
+    {
+      "id": 10,
+      "type": "session",
+      "title": "Negotiation Tactics Session",
+      "date": "June 5, 2025",
+      "time": "4:00 PM",
+      "location": "Online",
+      "description": "Learn effective negotiation strategies for salary discussions and career advancement."
+    },
+    {
+      "id": 11,
+      "type": "event",
+      "title": "Returning to Work After a Career Break",
+      "date": "May 30, 2025",
+      "time": "3:00 PM",
+      "location": "Online", 
+      "description": "Guidance for women resuming their careers after taking a break for various reasons."
+    },
+    {
+      "id": 12,
+      "type": "session",
+      "title": "Building Career in a Fast-Changing World",
+      "date": "April 17, 2025",
+      "time": "4:00 PM",
+      "location": "Online",
+      "description": "Learn how to stay relevant and build a successful career in today's rapidly evolving job market."
+    },
+    {
+      "id": 13,
+      "type": "event",
+      "title": "Women in Leadership Summit",
+      "date": "June 10, 2025",
+      "time": "9:00 AM",
+      "location": "Bangalore",
+      "description": "A full-day summit bringing together women leaders from various industries to share insights and experiences."
+    },
+    {
+      "id": 14,
+      "type": "session",
+      "title": "Managing Unconscious Bias in the Workplace",
+      "date": "May 24, 2025", 
+      "time": "11:00 AM",
+      "location": "Online",
+      "description": "Learn to identify and address unconscious bias to create a more inclusive work environment."
+    },
+    {
+      "id": 15,
+      "type": "event",
+      "title": "Tech Skills for Non-Technical Professionals",
+      "date": "June 3, 2025",
+      "time": "5:30 PM",
+      "location": "Online",
+      "description": "Essential tech skills every professional should know, regardless of their field."
+    }
+  ]

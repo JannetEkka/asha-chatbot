@@ -1,0 +1,54 @@
+version: "3.1"
+
+rules:
+
+- rule: Say goodbye anytime the user says goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: Say 'I am a bot' anytime the user challenges
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: Activate job search form
+  steps:
+  - intent: search_job
+  - action: job_search_form
+  - active_loop: job_search_form
+
+- rule: Submit job search form
+  condition:
+  - active_loop: job_search_form
+  steps:
+  - action: job_search_form
+  - active_loop: null
+  - slot_was_set:
+    - requested_slot: null
+  - action: action_search_jobs
+
+- rule: Out-of-scope
+  steps:
+  - intent: out_of_scope
+  - action: utter_out_of_scope
+
+- rule: FAQ handling
+  steps:
+  - intent: faq
+  - action: action_handle_faq
+
+- rule: Handle fallback
+  steps:
+  - intent: nlu_fallback
+  - action: utter_default
+
+- rule: Respond to thanks
+  steps:
+  - intent: thanks
+  - action: utter_you_are_welcome
+
+- rule: Address gender-biased inputs
+  steps:
+  - intent: gender_biased_input
+  - action: action_address_gender_bias

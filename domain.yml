@@ -1,0 +1,174 @@
+version: "3.1"
+
+assistant_id: "asha-chatbot-assistant"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - thanks
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  
+  # Job related intents
+  - search_job
+  - provide_job_preference
+  - list_jobs
+  
+  # Session and events related intents
+  - ask_about_events
+  - ask_about_sessions
+  - ask_about_mentorship
+  
+  # Women empowerment related intents
+  - ask_women_empowerment
+  - ask_career_advice
+  
+  # FAQ intents
+  - faq
+  
+  # Out of scope and fallback
+  - out_of_scope
+  - nlu_fallback
+
+entities:
+  - job_role
+  - job_type
+  - location
+  - experience
+  - skill
+  - company
+  - industry
+  - salary
+  - event_type
+  - date
+
+slots:
+  job_role:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: job_role
+  
+  job_type:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: job_type
+      
+  location:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: location
+  
+  experience:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: experience
+  
+  skill:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: skill
+
+  requested_slot:
+    type: categorical
+    values:
+      - job_role
+      - job_type
+      - location
+      - experience
+      - skill
+    influence_conversation: true
+    mappings:
+    - type: custom
+
+forms:
+  job_search_form:
+    required_slots:
+      - job_role
+      - location
+      - experience
+
+responses:
+  utter_greet:
+  - text: "Hello! I am Asha, your career assistant from JobsForHer. How can I help you today?"
+  
+  utter_goodbye:
+  - text: "Goodbye! Feel free to come back anytime you need assistance with your career journey."
+  
+  utter_iamabot:
+  - text: "I am Asha, an AI assistant designed to help women with career information, job opportunities, and empowerment resources."
+  
+  utter_default:
+  - text: "I'm sorry, I didn't quite understand that. Could you rephrase or try asking something else about job opportunities or career advice?"
+  
+  # Job search responses
+  utter_ask_job_search_form_job_role:
+  - text: "What kind of job role are you looking for?"
+  
+  utter_ask_job_search_form_location:
+  - text: "In which location would you prefer to work?"
+  
+  utter_ask_job_search_form_experience:
+  - text: "How many years of experience do you have?"
+  
+  utter_searching_jobs:
+  - text: "I'm searching for job opportunities that match your preferences..."
+  
+  utter_job_results:
+  - text: "I've found {count} job opportunities that match your criteria. Here are some of them:\n{job_results}"
+  
+  utter_no_jobs_found:
+  - text: "I couldn't find any jobs matching your exact criteria. Would you like to broaden your search?"
+  
+  # Event and session responses
+  utter_events_info:
+  - text: "JobsForHer organizes various events including workshops, webinars, and networking sessions. Would you like to know about upcoming events?"
+  
+  utter_sessions_info:
+  - text: "We have various mentorship sessions and learning opportunities available. What type of session are you interested in?"
+  
+  utter_mentorship_info:
+  - text: "Our mentorship programs connect you with experienced professionals who can guide you in your career journey. Would you like to know more about how to join?"
+  
+  # Women empowerment responses
+  utter_women_empowerment:
+  - text: "At JobsForHer, we believe in empowering women in their careers through resources, networking, and opportunities. We provide platforms for women to upskill, return to work after breaks, and advance in their careers."
+  
+  utter_career_advice:
+  - text: "Building a successful career requires continuous learning, networking, and strategic planning. Would you like specific advice about career advancement, returning to work, or upskilling?"
+  
+  # FAQ responses
+  utter_faq:
+  - text: "Here's information about that: {faq_answer}"
+  
+  # Out of scope responses
+  utter_out_of_scope:
+  - text: "I'm sorry, that's beyond my current capabilities. I'm here to help with job searches, career advice, and information about JobsForHer's programs and events."
+  
+  # Handling gender bias
+  utter_address_gender_bias:
+  - text: "At JobsForHer, we believe in equal opportunities and breaking gender stereotypes. Women have proven to excel in every field and role. Would you like to see success stories of women leaders?"
+
+session_config:
+  session_expiration_time: 60  # minutes
+  carry_over_slots_to_new_session: true
+
+actions:
+  - action_search_jobs
+  - action_provide_events_info
+  - action_provide_sessions_info
+  - action_provide_mentorship_info
+  - action_handle_faq
+  - action_address_gender_bias
