@@ -36,6 +36,7 @@ from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet, FollowupAction, AllSlotsReset
+from difflib import get_close_matches
 
 class ActionSearchJobs(Action):
     """Action to search for jobs based on user preferences."""
@@ -283,7 +284,41 @@ Would you like to know more about any specific mentorship program?"""
         return []
 
 class ActionHandleFAQ(Action):
-    """Action to handle frequently asked questions."""
+    """Enhanced action to handle frequently asked questions using the structured FAQ data."""
+
+    def __init__(self):
+        # Load the FAQ database
+        try:
+            faq_path = os.path.join(os.getcwd(), "data", "faqs.json")
+            if os.path.exists(faq_path):
+                with open(faq_path, 'r') as f:
+                    faq_data = json.load(f)
+                    
+                # Create lookup structures for efficient question matching
+                self.all_questions = []
+                self.question_to_answer = {}
+                self.question_to_category = {}
+                
+                for category in faq_data.get("faq", []):
+                    category_name = category.get("category", "General")
+                    for q_item in category.get("questions", []):
+                        question = q_item.get("question", "").lower()
+                        answer = q_item.get("answer", "")
+                        
+                        if question and answer:
+                            self.all_questions.append(question)
+                            self.question_to_answer[question] = answer
+                            self.question_to_category[question] = category_name
+            else:
+                self.all_questions = []
+                self.question_to_answer = {}
+                self.question_to_category = {}
+                print(f"FAQ file not found at {faq_path}")
+        except Exception as e:
+            self.all_questions = []
+            self.question_to_answer = {}
+            self.question_to_category = {}
+            print(f"Error loading FAQ data: {e}")
 
     def name(self) -> Text:
         return "action_handle_faq"
@@ -296,44 +331,32 @@ class ActionHandleFAQ(Action):
         # Get the latest user message
         user_message = tracker.latest_message.get('text', '').lower()
         
-        # FAQ database - in a real implementation, this would be stored externally
-        faq_db = {
-            "what is jobsforher": "JobsForHer is a platform dedicated to accelerating women's careers by connecting them with job opportunities, mentorship, and resources for upskilling.",
-            
-            "how can jobsforher help me": "JobsForHer can help you find job opportunities tailored to your skills and preferences, connect you with mentors, provide access to networking events, and offer resources for professional development.",
-            
-            "is jobsforher only for women": "JobsForHer primarily focuses on women's career advancement, but anyone interested in diversity and inclusion can benefit from our resources and community.",
-            
-            "does jobsforher charge any fees": "Basic services on JobsForHer are free for job seekers. Premium services that provide enhanced visibility to employers and priority access to events may have a fee associated.",
-            
-            "how do i create an account": "You can create an account by visiting our website, clicking on 'Sign Up', and following the registration process. You'll need to provide basic information and create your profile.",
-            
-            "what resources does jobsforher provide": "JobsForHer provides job listings, mentorship programs, career resources, webinars, workshops, networking events, and a supportive community for women professionals.",
-            
-            "how can i post my resume": "After creating an account on JobsForHer, you can build your profile, which serves as your resume. Go to 'My Profile' and fill in your education, work experience, skills, and career preferences.",
-            
-            "how do employers use jobsforher": "Employers use JobsForHer to post job opportunities, search for qualified candidates, participate in virtual job fairs, and demonstrate their commitment to diversity and inclusion.",
-            
-            "does jobsforher offer career counseling": "Yes, JobsForHer offers career counseling through our mentorship programs, where experienced professionals provide guidance on career growth, transitions, and development.",
-            
-            "can men use jobsforher": "While JobsForHer's primary focus is on women's career advancement, men can use the platform to access resources on diversity and inclusion and to support women's professional growth.",
-            
-            "what makes jobsforher different from other job sites": "JobsForHer is specifically tailored to women's career needs, offering not just job listings but also mentorship, community support, and resources to help women overcome unique challenges in their professional journey.",
-            
-            "how successful is jobsforher": "JobsForHer has helped thousands of women find meaningful employment, advance in their careers, and return to the workforce after career breaks. We work with hundreds of companies committed to diversity and inclusion."
-        }
+        # Try to find the closest matching question
+        matches = get_close_matches(user_message, self.all_questions, n=1, cutoff=0.6)
         
-        # Default response if no match is found
-        answer = "I don't have specific information on that. Please check our website for more details or contact our support team."
+        if matches:
+            matched_question = matches[0]
+            answer = self.question_to_answer[matched_question]
+            category = self.question_to_category[matched_question]
+            
+            # Add a more empathetic intro based on category
+            if "technical" in category.lower():
+                intro = "I understand technical issues can be frustrating. "
+            elif "career" in category.lower():
+                intro = "Great question about career development! "
+            elif "job search" in category.lower():
+                intro = "I'm happy to help with your job search journey. "
+            elif "mentorship" in category.lower():
+                intro = "Mentorship is key to career growth. "
+            else:
+                intro = "Here's what I found for you: "
+            
+            # Send the response
+            dispatcher.utter_message(text=f"{intro}{answer}")
+        else:
+            # Default response if no match is found
+            dispatcher.utter_message(text="I don't have specific information on that. Please try rewording your question, or ask about job opportunities, career advice, or HerKey's services.")
         
-        # Find the closest matching question
-        for question, response in faq_db.items():
-            if any(keyword in user_message for keyword in question.split()):
-                answer = response
-                break
-        
-        # Send the response
-        dispatcher.utter_message(template="utter_faq", faq_answer=answer)
         return []
 
 class ActionAddressGenderBias(Action):
@@ -444,3 +467,46 @@ class ValidateJobSearchForm(FormValidationAction):
             # Invalid experience
             dispatcher.utter_message(text="Please provide your years of experience, such as '2 years' or 'entry level'.")
             return {"experience": None}
+        
+class ActionPauseConversation(Action):
+    """Pauses the current conversation and stores the state."""
+
+    def name(self) -> Text:
+        return "action_pause_conversation"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        # Get current conversation state
+        current_state = {
+            "active_form": tracker.active_form.get("name"),
+            "slots": tracker.current_slot_values(),
+            "latest_action": tracker.latest_action_name
+        }
+        
+        # Store state in a slot for later retrieval
+        dispatcher.utter_message(text="I've paused our conversation. What additional details would you like to add?")
+        
+        return [SlotSet("paused_state", current_state)]
+
+class ActionResumeConversation(Action):
+    """Resumes conversation from paused state."""
+
+    def name(self) -> Text:
+        return "action_resume_conversation"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        paused_state = tracker.get_slot("paused_state")
+        if not paused_state:
+            dispatcher.utter_message(text="I couldn't find a paused conversation to resume.")
+            return []
+        
+        # Resume the previous state
+        dispatcher.utter_message(text="I'm continuing our previous conversation with the new information you've provided.")
+        
+        # Clear the paused state
+        return [SlotSet("paused_state", None)]

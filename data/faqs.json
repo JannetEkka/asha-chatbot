@@ -1,0 +1,100 @@
+{
+    "faq": [
+      {
+        "category": "Platform Features and Benefits",
+        "questions": [
+          {
+            "question": "What is HerKey and how does it support women's careers?",
+            "answer": "HerKey is India's largest AI-powered career engagement platform dedicated to supporting women's career aspirations. It offers job opportunities, learning resources, mentorship programs, and community support to help women start, restart, and advance their careers. :contentReference[oaicite:0]{index=0}"
+          },
+          {
+            "question": "How does HerKey differ from other job portals?",
+            "answer": "Unlike generic job portals, HerKey focuses exclusively on women's career development. It provides tailored resources such as mentorship programs, networking events, and skill development courses, creating a supportive ecosystem for women professionals. :contentReference[oaicite:1]{index=1}"
+          },
+          {
+            "question": "What types of job opportunities are available on HerKey?",
+            "answer": "HerKey offers a diverse range of job opportunities, including full-time, part-time, freelance, and work-from-home positions across various industries, catering specifically to women's career needs. :contentReference[oaicite:2]{index=2}"
+          }
+        ]
+      },
+      {
+        "category": "Career Development for Women",
+        "questions": [
+          {
+            "question": "How does HerKey assist women returning to the workforce?",
+            "answer": "HerKey provides specialized programs like 'MentorHer' and 'SkillReBoot' designed to help women re-enter the workforce confidently by offering mentorship, skill development, and networking opportunities. :contentReference[oaicite:3]{index=3}"
+          },
+          {
+            "question": "Are there resources for women looking to upskill?",
+            "answer": "Yes, HerKey offers various learning resources and programs aimed at upskilling women in areas like technology, leadership, and soft skills to enhance their employability and career growth. :contentReference[oaicite:4]{index=4}"
+          }
+        ]
+      },
+      {
+        "category": "Job Search Process",
+        "questions": [
+          {
+            "question": "How can I search for jobs on HerKey?",
+            "answer": "To search for jobs on HerKey, create an account, complete your profile, and use the job search feature to find opportunities that match your skills and preferences. :contentReference[oaicite:5]{index=5}"
+          },
+          {
+            "question": "Does HerKey offer remote job opportunities?",
+            "answer": "Yes, HerKey features a variety of remote job opportunities, including work-from-home and freelance positions, suitable for women seeking flexible work arrangements. :contentReference[oaicite:6]{index=6}"
+          }
+        ]
+      },
+      {
+        "category": "Mentorship Programs",
+        "questions": [
+          {
+            "question": "What is the 'MentorHer' program?",
+            "answer": "The 'MentorHer' program is a one-on-one mentorship initiative by HerKey that connects women with experienced industry professionals to guide them in their career journeys. :contentReference[oaicite:7]{index=7}"
+          },
+          {
+            "question": "How can I enroll in a mentorship program on HerKey?",
+            "answer": "To enroll in a mentorship program, visit the HerKey events page, select a mentorship event that suits your needs, and follow the registration instructions provided. :contentReference[oaicite:8]{index=8}"
+          }
+        ]
+      },
+      {
+        "category": "Events and Networking",
+        "questions": [
+          {
+            "question": "What types of events does HerKey organize?",
+            "answer": "HerKey organizes various events, including networking sessions, hiring events, webinars, and conferences like 'HerRising,' aimed at connecting women with industry leaders and potential employers. :contentReference[oaicite:9]{index=9}"
+          },
+          {
+            "question": "How can I participate in HerKey's networking events?",
+            "answer": "To participate, visit the HerKey events page, browse upcoming events, and register for those that align with your interests and career goals. :contentReference[oaicite:10]{index=10}"
+          }
+        ]
+      },
+      {
+        "category": "Account Management",
+        "questions": [
+          {
+            "question": "How do I create an account on HerKey?",
+            "answer": "To create an account, go to the HerKey website, click on 'Sign Up,' and fill in the required details to set up your profile."
+          },
+          {
+            "question": "Can I update my profile information after registration?",
+            "answer": "Yes, you can update your profile information at any time by logging into your account and editing your profile details."
+          }
+        ]
+      },
+      {
+        "category": "Common Technical Issues",
+        "questions": [
+          {
+            "question": "I'm facing issues logging into my HerKey account. What should I do?",
+            "answer": "If you're experiencing login issues, try resetting your password using the 'Forgot Password' option. If the problem persists, contact HerKey's support team for assistance."
+          },
+          {
+            "question": "The website isn't loading properly. How can I fix this?",
+            "answer": "Ensure you have a stable internet connection and try clearing your browser cache. If the issue continues, try accessing the site using a different browser or device."
+          }
+        ]
+      }
+    ]
+  }
+  

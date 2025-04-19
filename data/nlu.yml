@@ -113,7 +113,6 @@ nlu:
     - I need a job
     - help me find a job
     - I am looking for job opportunities
-    - show me job openings
     - I want to search for jobs
     - find me a job
     - I need employment
@@ -135,6 +134,17 @@ nlu:
     - jobs with [python](skill) requirements
     - position requiring [project management](skill) skills
 
+- intent: list_jobs
+  examples: |
+    - list all jobs
+    - display job listings
+    - what positions are open
+    - what are the current openings
+    - show all job opportunities
+    - what jobs do you have
+    - list current vacancies
+    - tell me about job openings
+
 - intent: provide_job_preference
   examples: |
     - I prefer to work in [Bangalore](location)
@@ -151,19 +161,6 @@ nlu:
     - I'm looking for a salary of [15 lakhs](salary)
     - I want to work at [Google](company)
     - I prefer [small startups](company)
-
-- intent: list_jobs
-  examples: |
-    - list all jobs
-    - show me job openings
-    - what jobs are available
-    - display job listings
-    - what positions are open
-    - what are the current openings
-    - show all job opportunities
-    - what jobs do you have
-    - list current vacancies
-    - tell me about job openings
 
 # Session and events related intents
 - intent: ask_about_events
@@ -278,3 +275,31 @@ nlu:
     - asdfghjkl
     - qwertyuiop
     - 123456789
+
+    
+# Trigger intents for pausing/resuming conversations
+- intent: trigger_pause
+  examples: |
+    - /trigger_pause
+    - pause the conversation
+    - hold on a minute
+    - wait
+    
+- intent: trigger_resume
+  examples: |
+    - /trigger_resume
+    - continue the conversation
+    - let's continue
+    - resume
+    
+# Gender-biased input intent
+- intent: gender_biased_input
+  examples: |
+    - women can't code
+    - women are not good at tech
+    - women don't belong in leadership
+    - men are better managers
+    - women are too emotional for business
+    - women should stay at home
+    - women are inferior in STEM
+    - men do better in technical roles

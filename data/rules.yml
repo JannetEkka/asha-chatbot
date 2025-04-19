@@ -17,6 +17,8 @@ rules:
   - intent: search_job
   - action: job_search_form
   - active_loop: job_search_form
+  - slot_was_set:
+    - requested_slot: job_role
 
 - rule: Submit job search form
   condition:
@@ -52,3 +54,33 @@ rules:
   steps:
   - intent: gender_biased_input
   - action: action_address_gender_bias
+
+- rule: Pause conversation
+  steps:
+  - intent: trigger_pause
+  - action: action_pause_conversation
+
+- rule: Resume conversation
+  steps:
+  - intent: trigger_resume
+  - action: action_resume_conversation
+
+- rule: Get list of jobs
+  steps:
+  - intent: list_jobs
+  - action: action_search_jobs
+
+- rule: Ask about events
+  steps:
+  - intent: ask_about_events
+  - action: action_provide_events_info
+
+- rule: Ask about sessions
+  steps:
+  - intent: ask_about_sessions
+  - action: action_provide_sessions_info
+
+- rule: Ask about mentorship
+  steps:
+  - intent: ask_about_mentorship
+  - action: action_provide_mentorship_info

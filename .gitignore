@@ -27,6 +27,7 @@ ENV/
 
 # Rasa
 models/
+extracted_model/
 
 # VSCode
 .vscode/

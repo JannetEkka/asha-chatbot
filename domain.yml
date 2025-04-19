@@ -33,6 +33,13 @@ intents:
   - out_of_scope
   - nlu_fallback
 
+  # Action trigger intents
+  - trigger_pause
+  - trigger_resume
+  
+  # Gender bias intent
+  - gender_biased_input
+
 entities:
   - job_role
   - job_type
@@ -46,6 +53,11 @@ entities:
   - date
 
 slots:
+  paused_state:
+    type: any
+    influence_conversation: false
+    mappings:
+    - type: custom
   job_role:
     type: text
     influence_conversation: true
@@ -101,6 +113,27 @@ forms:
       - experience
 
 responses:
+  utter_you_are_welcome:
+  - text: "You're welcome! I'm happy to help with your career journey."
+  
+  utter_happy:
+  - text: "Great! How can I help you with your career today?"
+
+  utter_cheer_up:
+  - text: "I understand things can be challenging. Remember that every career has ups and downs. Is there something specific I can help you with?"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+  
+  utter_paused:
+  - text: "I've paused our conversation. What additional details would you like to add?"
+  
+  utter_resumed:
+  - text: "I'm continuing our conversation with the new information you've provided."
+  
+  utter_no_paused_state:
+  - text: "I couldn't find a paused conversation to resume."
+
   utter_greet:
   - text: "Hello! I am Asha, your career assistant from JobsForHer. How can I help you today?"
   
@@ -127,11 +160,11 @@ responses:
   - text: "I'm searching for job opportunities that match your preferences..."
   
   utter_job_results:
-  - text: "I've found {count} job opportunities that match your criteria. Here are some of them:\n{job_results}"
+  - text: "Great news! I've found {count} job opportunities that match your criteria. I know job searching can be challenging, but these roles look promising for your skills:\n{job_results}"
   
   utter_no_jobs_found:
-  - text: "I couldn't find any jobs matching your exact criteria. Would you like to broaden your search?"
-  
+  - text: "I understand how frustrating job searching can be. I couldn't find exact matches for your criteria, but don't be discouraged. Would you like to broaden your search a bit? Sometimes a small adjustment can open up many more opportunities."
+    
   # Event and session responses
   utter_events_info:
   - text: "JobsForHer organizes various events including workshops, webinars, and networking sessions. Would you like to know about upcoming events?"
@@ -172,3 +205,6 @@ actions:
   - action_provide_mentorship_info
   - action_handle_faq
   - action_address_gender_bias
+  - action_pause_conversation
+  - action_resume_conversation
+  - validate_job_search_form

@@ -1,0 +1,8 @@
+{
+  "rule_only_slots": [
+    "requested_slot"
+  ],
+  "rule_only_loops": [
+    "job_search_form"
+  ]
+}

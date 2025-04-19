@@ -103,7 +103,7 @@ Using Rasa's dialogue management capabilities, Asha maintains context throughout
 
 ## Contributors
 
-- [Your Name]
+- Jannet Akanksha Ekka
 - JobsForHer Foundation Team
 
 ## License

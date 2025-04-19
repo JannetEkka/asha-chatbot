@@ -73,6 +73,154 @@
                 flex-basis: 100%;
             }
         }
+
+        .chat-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .control-button {
+            background-color: #9c27b0;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            margin: 0 5px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .control-button:hover {
+            background-color: #7b1fa2;
+        }
+        
+        /* Styling for chat widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #9c27b0;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .chat-button img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+        }
+        
+        .chat-window {
+            display: none;
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 450px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            overflow: hidden;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            background-color: #9c27b0;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-title {
+            font-weight: bold;
+        }
+        
+        .chat-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .chat-close {
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+        
+        .bot-message {
+            background-color: #8bc34a;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .user-message {
+            background-color: #9c27b0;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .chat-input button {
+            background-color: #9c27b0;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .chat-input button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -100,6 +248,11 @@
         </div>
         
         <p>Start a conversation with Asha using the chat widget in the bottom-right corner. Ask about job opportunities, career advice, or any questions about the JobsForHer Foundation!</p>
+        
+        <div id="chat-controls" class="chat-controls" style="display: none;">
+            <button id="pauseButton" class="control-button" style="display: none;">Pause</button>
+            <button id="resumeButton" class="control-button" style="display: none;">Continue</button>
+        </div>
     </main>
     
     <footer>
@@ -108,8 +261,239 @@
         </div>
     </footer>
     
-    <!-- Rasa Chat Widget -->
-    <div id="rasa-chat-widget" data-websocket-url="http://localhost:5005"></div>
-    <script src="https://unpkg.com/@rasahq/rasa-chat" type="application/javascript"></script>
+    <!-- Custom Chat Widget -->
+    <div class="chat-widget">
+        <div class="chat-button" id="chat-toggle">
+            <img src="https://i.imgur.com/nGF1K8f.jpg" alt="Asha">
+        </div>
+        <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+                <div>
+                    <div class="chat-title">Asha - Your Career Assistant</div>
+                    <div class="chat-subtitle">JobsForHer Foundation</div>
+                </div>
+                <div class="chat-close" id="chat-close">×</div>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be added here -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Type a message...">
+                <button id="send-button" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chat widget elements
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatWindow = document.getElementById('chat-window');
+            const chatClose = document.getElementById('chat-close');
+            const chatMessages = document.getElementById('chat-messages');
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            
+            // Chat control elements
+            const pauseButton = document.getElementById('pauseButton');
+            const resumeButton = document.getElementById('resumeButton');
+            const chatControls = document.getElementById('chat-controls');
+            
+            // Open and close the chat window
+            chatToggle.addEventListener('click', function() {
+                chatWindow.style.display = 'flex';
+                
+                // Send greeting message when opening for the first time
+                if (chatMessages.childElementCount === 0) {
+                    sendBotMessage("👋 Hello! I am Asha, your career assistant from JobsForHer. How can I help you today?");
+                }
+                
+                // Show pause button
+                chatControls.style.display = 'flex';
+                pauseButton.style.display = 'inline-block';
+                resumeButton.style.display = 'none';
+                
+                // Focus on input field
+                messageInput.focus();
+            });
+            
+            chatClose.addEventListener('click', function() {
+                chatWindow.style.display = 'none';
+                chatControls.style.display = 'none';
+            });
+            
+            // Enable/disable send button based on input
+            messageInput.addEventListener('input', function() {
+                sendButton.disabled = messageInput.value.trim() === '';
+            });
+            
+            // Send message on Enter key
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && messageInput.value.trim() !== '') {
+                    sendMessage();
+                }
+            });
+            
+            // Send message on button click
+            sendButton.addEventListener('click', sendMessage);
+            
+            // Pause and Resume buttons
+            pauseButton.addEventListener('click', function() {
+                sendToRasa('/trigger_pause');
+                pauseButton.style.display = 'none';
+                resumeButton.style.display = 'inline-block';
+            });
+            
+            resumeButton.addEventListener('click', function() {
+                sendToRasa('/trigger_resume');
+                resumeButton.style.display = 'none';
+                pauseButton.style.display = 'inline-block';
+            });
+            
+            // Function to send user message
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message === '') return;
+                
+                // Add user message to chat
+                const userMessageElement = document.createElement('div');
+                userMessageElement.className = 'message user-message';
+                userMessageElement.textContent = message;
+                chatMessages.appendChild(userMessageElement);
+                
+                // Clear input
+                messageInput.value = '';
+                sendButton.disabled = true;
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Send to Rasa
+                sendToRasa(message);
+            }
+            
+            // Function to send message to Rasa server
+            function sendToRasa(message) {
+                // Show typing indicator
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message bot-message typing-indicator';
+                typingIndicator.textContent = '...';
+                typingIndicator.id = 'typing-indicator';
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Send to Rasa REST API
+                fetch('http://localhost:5005/webhooks/rest/webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sender: 'user',
+                        message: message
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) chatMessages.removeChild(indicator);
+                    
+                    // Process responses
+                    if (data && data.length > 0) {
+                        data.forEach(reply => {
+                            if (reply.text) {
+                                sendBotMessage(reply.text);
+                            }
+                            // Handle buttons if present
+                            if (reply.buttons) {
+                                const buttonsContainer = document.createElement('div');
+                                buttonsContainer.className = 'message bot-message buttons-container';
+                                
+                                reply.buttons.forEach(button => {
+                                    const buttonElement = document.createElement('button');
+                                    buttonElement.className = 'response-button';
+                                    buttonElement.textContent = button.title;
+                                    buttonElement.addEventListener('click', function() {
+                                        // Add button text as user message
+                                        const userMessageElement = document.createElement('div');
+                                        userMessageElement.className = 'message user-message';
+                                        userMessageElement.textContent = button.title;
+                                        chatMessages.appendChild(userMessageElement);
+                                        
+                                        // Send payload to Rasa
+                                        sendToRasa(button.payload);
+                                    });
+                                    buttonsContainer.appendChild(buttonElement);
+                                });
+                                
+                                chatMessages.appendChild(buttonsContainer);
+                            }
+                        });
+                    } else {
+                        // No response
+                        sendBotMessage("I'm sorry, I couldn't process your request at the moment. Please try again later.");
+                    }
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                })
+                .catch(error => {
+                    // Remove typing indicator
+                    const indicator = document.getElementById('typing-indicator');
+                    if (indicator) chatMessages.removeChild(indicator);
+                    
+                    console.error('Error:', error);
+                    sendBotMessage("I'm having trouble connecting to my server. Please check your connection and try again.");
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            }
+            
+            // Function to add bot message
+            function sendBotMessage(message) {
+                const botMessageElement = document.createElement('div');
+                botMessageElement.className = 'message bot-message';
+                botMessageElement.textContent = message;
+                chatMessages.appendChild(botMessageElement);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Style for response buttons
+            const buttonStyle = document.createElement('style');
+            buttonStyle.textContent = `
+                .buttons-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 5px;
+                }
+                .response-button {
+                    background-color: white;
+                    color: #9c27b0;
+                    border: 1px solid #9c27b0;
+                    border-radius: 15px;
+                    padding: 5px 10px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    margin: 2px;
+                }
+                .response-button:hover {
+                    background-color: #f0f0f0;
+                }
+                .typing-indicator {
+                    opacity: 0.7;
+                }
+            `;
+            document.head.appendChild(buttonStyle);
+        });
+    </script>
 </body>
 </html>
