@@ -30,6 +30,11 @@ rules:
     - requested_slot: null
   - action: action_search_jobs
 
+- rule: Handle job preference as continuation of search
+  steps:
+  - intent: provide_job_preference
+  - action: action_search_jobs
+
 - rule: Out-of-scope
   steps:
   - intent: out_of_scope
@@ -84,3 +89,13 @@ rules:
   steps:
   - intent: ask_about_mentorship
   - action: action_provide_mentorship_info
+
+- rule: Ask about women empowerment
+  steps:
+  - intent: ask_women_empowerment
+  - action: utter_women_empowerment
+
+- rule: Ask for career advice
+  steps:
+  - intent: ask_career_advice
+  - action: utter_career_advice

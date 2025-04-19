@@ -56,9 +56,15 @@ class ActionSearchJobs(Action):
         job_type = tracker.get_slot("job_type")
         skill = tracker.get_slot("skill")
         
-        # Mock job search functionality
-        # In a real implementation, this would query the job_listing_data.csv
-        # For now, we'll use a simple mock response
+        # Check latest message to update job_role if needed
+        latest_message = tracker.latest_message.get('text', '').lower()
+        if 'data science' in latest_message or 'scientist' in latest_message:
+            job_role = 'data science'
+        elif 'software' in latest_message and ('engineer' in latest_message or 'engineering' in latest_message or 'developer' in latest_message):
+            job_role = 'software developer'
+        
+        # Log the search criteria for debugging
+        print(f"Searching for jobs with criteria: role={job_role}, location={location}, experience={experience}")
         
         # Try to load the job listing data if available
         job_data = []
@@ -68,32 +74,60 @@ class ActionSearchJobs(Action):
             
             if os.path.exists(data_path):
                 # Read the data
+                import pandas as pd
                 job_data = pd.read_csv(data_path)
                 
-                # Filter based on user preferences
+                # Debug: Print first few rows to see the structure
+                print(f"CSV loaded. Found {len(job_data)} jobs. Sample: {job_data.head(2)}")
+                
+                # Make all string columns lowercase for case-insensitive comparison
+                for col in job_data.columns:
+                    if job_data[col].dtype == 'object':
+                        job_data[col] = job_data[col].str.lower()
+                
+                # Convert search terms to lowercase
                 if job_role:
-                    job_data = job_data[job_data['role'].str.contains(job_role, case=False, na=False)]
+                    job_role = job_role.lower()
+                if location:
+                    location = location.lower()
+                if job_type:
+                    job_type = job_type.lower()
+                if skill:
+                    skill = skill.lower()
+                
+                # Use more flexible filtering with partial matches
+                filtered_data = job_data.copy()
+                
+                if job_role:
+                    filtered_data = filtered_data[
+                        filtered_data['role'].str.contains(job_role, case=False, na=False) | 
+                        filtered_data['title'].str.contains(job_role, case=False, na=False)
+                    ]
                 
                 if location:
-                    job_data = job_data[job_data['location'].str.contains(location, case=False, na=False)]
+                    filtered_data = filtered_data[filtered_data['location'].str.contains(location, case=False, na=False)]
                 
                 if experience:
-                    # Assuming experience is stored as a range or number in the CSV
-                    # This is a simplified filter
-                    job_data = job_data[job_data['experience'].astype(str).str.contains(experience, case=False, na=False)]
+                    # Handle experience as string that might contain numbers
+                    # This is a more flexible approach than exact matching
+                    exp_str = str(experience).lower()
+                    exp_digits = ''.join(c for c in exp_str if c.isdigit())
+                    if exp_digits:
+                        # If we extracted digits, filter by those
+                        filtered_data = filtered_data[filtered_data['experience'].astype(str).str.contains(exp_digits, na=False)]
                 
                 if job_type:
-                    job_data = job_data[job_data['job_type'].str.contains(job_type, case=False, na=False)]
+                    filtered_data = filtered_data[filtered_data['job_type'].str.contains(job_type, case=False, na=False)]
                 
                 if skill:
-                    job_data = job_data[job_data['skills'].str.contains(skill, case=False, na=False)]
+                    filtered_data = filtered_data[filtered_data['skills'].str.contains(skill, case=False, na=False)]
                 
                 # Format the results
-                job_count = len(job_data)
+                job_count = len(filtered_data)
                 
                 if job_count > 0:
                     # Take the top 5 jobs to show
-                    top_jobs = job_data.head(5)
+                    top_jobs = filtered_data.head(5)
                     
                     job_results = ""
                     for index, job in top_jobs.iterrows():
@@ -106,8 +140,34 @@ class ActionSearchJobs(Action):
                         job_results=job_results
                     )
                 else:
-                    # No jobs found
-                    dispatcher.utter_message(template="utter_no_jobs_found")
+                    # No jobs found - save the new role for future searches
+                    if job_role and job_role != tracker.get_slot("job_role"):
+                        update_slots = [SlotSet("job_role", job_role)]
+                    else:
+                        update_slots = []
+                        
+                    # No jobs found - suggest alternatives
+                    alternative_message = "I couldn't find exact matches for your criteria. "
+                    
+                    if job_role and location:
+                        # Check if there are jobs with this role regardless of location
+                        role_matches = job_data[job_data['role'].str.contains(job_role, case=False, na=False) | 
+                                              job_data['title'].str.contains(job_role, case=False, na=False)]
+                        
+                        if len(role_matches) > 0:
+                            # There are jobs with this role in other locations
+                            alternative_message += f"I found {len(role_matches)} {job_role} positions in other locations. "
+                            alternative_message += "Would you like to search without location restrictions?"
+                        else:
+                            # No jobs with this role at all
+                            alternative_message += f"I don't have any current listings for {job_role} roles. "
+                            alternative_message += "Would you like to try a different role or broaden your search criteria?"
+                    else:
+                        alternative_message += "Would you like to broaden your search criteria or try a different role?"
+                    
+                    dispatcher.utter_message(text=alternative_message)
+                    
+                    return update_slots
             
             else:
                 # If the data file doesn't exist, use mock data
@@ -122,6 +182,9 @@ class ActionSearchJobs(Action):
                 )
                 
         except Exception as e:
+            # Log the exception
+            print(f"Error in job search: {str(e)}")
+            
             # If there's an error, use mock data
             dispatcher.utter_message(
                 template="utter_job_results",
@@ -133,6 +196,7 @@ class ActionSearchJobs(Action):
 - HR Specialist at PeopleFirst (Hyderabad)"""
             )
             
+        # Return empty list as we're not setting any slots
         return []
 
 class ActionProvideEventsInfo(Action):
@@ -425,12 +489,33 @@ class ValidateJobSearchForm(FormValidationAction):
     ) -> Dict[Text, Any]:
         """Validate job role value."""
         
-        if slot_value and len(slot_value) > 2:
+        if not slot_value:
+            # Check if we can extract job role from the message
+            latest_message = tracker.latest_message.get('text', '').lower()
+            
+            # Try to extract common job roles
+            if 'data science' in latest_message or 'data scientist' in latest_message:
+                return {"job_role": "data science"}
+            elif 'software' in latest_message and ('engineer' in latest_message or 'developer' in latest_message):
+                return {"job_role": "software developer"}
+            elif 'product manager' in latest_message:
+                return {"job_role": "product manager"}
+            elif 'marketing' in latest_message:
+                return {"job_role": "marketing"}
+            elif 'designer' in latest_message or 'design' in latest_message:
+                return {"job_role": "designer"}
+            
+            # No job role detected
+            dispatcher.utter_message(text="Please provide a valid job role, such as 'Software Developer', 'Data Scientist', or 'Marketing Manager'.")
+            return {"job_role": None}
+        
+        # We have a slot value
+        if len(slot_value) > 2:
             # Valid job role
             return {"job_role": slot_value}
         else:
-            # Invalid job role
-            dispatcher.utter_message(text="Please provide a valid job role, such as 'Software Developer' or 'Marketing Manager'.")
+            # Invalid job role (too short)
+            dispatcher.utter_message(text="Please provide a more specific job role, such as 'Software Developer' or 'Marketing Manager'.")
             return {"job_role": None}
 
     def validate_location(
@@ -442,11 +527,46 @@ class ValidateJobSearchForm(FormValidationAction):
     ) -> Dict[Text, Any]:
         """Validate location value."""
         
-        if slot_value and len(slot_value) > 2:
+        if not slot_value:
+            # Check if we can extract location from the message
+            latest_message = tracker.latest_message.get('text', '').lower()
+            
+            # Try to extract common locations
+            if 'bangalore' in latest_message:
+                return {"location": "Bangalore"}
+            elif 'mumbai' in latest_message:
+                return {"location": "Mumbai"}
+            elif 'delhi' in latest_message:
+                return {"location": "Delhi"}
+            elif 'hyderabad' in latest_message:
+                return {"location": "Hyderabad"}
+            elif 'remote' in latest_message or 'work from home' in latest_message:
+                return {"location": "Remote"}
+            
+            # No location detected
+            dispatcher.utter_message(text="Please provide a valid location, such as 'Bangalore', 'Mumbai', or 'Remote'.")
+            return {"location": None}
+        
+        # We have a slot value
+        if len(slot_value) > 2:
             # Valid location
+            # Check for common location spelling variations
+            slot_value_lower = slot_value.lower()
+            if 'bangalore' in slot_value_lower:
+                return {"location": "Bangalore"}
+            elif 'mumbai' in slot_value_lower:
+                return {"location": "Mumbai"}
+            elif 'delhi' in slot_value_lower:
+                return {"location": "Delhi"}
+            elif 'hyderabad' in slot_value_lower:
+                return {"location": "Hyderabad"}
+            elif 'remote' in slot_value_lower or 'work from home' in slot_value_lower:
+                return {"location": "Remote"}
+            
+            # Other location
             return {"location": slot_value}
         else:
-            # Invalid location
+            # Invalid location (too short)
             dispatcher.utter_message(text="Please provide a valid location, such as 'Bangalore' or 'Remote'.")
             return {"location": None}
 
@@ -459,13 +579,37 @@ class ValidateJobSearchForm(FormValidationAction):
     ) -> Dict[Text, Any]:
         """Validate experience value."""
         
-        # Experience can be a number or a range
+        if not slot_value:
+            # Check if we can extract experience from the message
+            latest_message = tracker.latest_message.get('text', '').lower()
+            
+            # Try to extract years of experience
+            import re
+            years_match = re.search(r'(\d+)\s*(?:years?|yrs?)', latest_message)
+            if years_match:
+                years = years_match.group(1)
+                return {"experience": f"{years} years"}
+            
+            # Check for experience levels
+            if 'entry' in latest_message or 'junior' in latest_message or 'fresher' in latest_message:
+                return {"experience": "entry level"}
+            elif 'mid' in latest_message:
+                return {"experience": "mid level"}
+            elif 'senior' in latest_message or 'experienced' in latest_message:
+                return {"experience": "senior level"}
+            
+            # No experience detected
+            dispatcher.utter_message(text="Please provide your years of experience, such as '3 years' or specify if you're at entry, mid, or senior level.")
+            return {"experience": None}
+        
+        # We have a slot value
+        # Experience can be a number, a range, or a level
         if slot_value:
             # Valid experience
             return {"experience": slot_value}
         else:
             # Invalid experience
-            dispatcher.utter_message(text="Please provide your years of experience, such as '2 years' or 'entry level'.")
+            dispatcher.utter_message(text="Please provide your years of experience, such as '3 years' or specify if you're at entry, mid, or senior level.")
             return {"experience": None}
         
 class ActionPauseConversation(Action):

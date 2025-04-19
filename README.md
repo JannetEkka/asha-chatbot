@@ -4,7 +4,7 @@ Asha is an AI-powered chatbot designed for the JobsForHer Foundation to assist w
 
 ## Features
 
-- **Job Search**: Find job opportunities based on role, location, and experience
+- **Job Search**: Find job opportunities based on role, location, and experience with contextual search refinement
 - **Events & Sessions**: Get information about upcoming community events and learning sessions
 - **Mentorship**: Learn about mentorship programs and how to connect with mentors
 - **Career Resources**: Access information about women empowerment initiatives and career advice
@@ -14,8 +14,16 @@ Asha is an AI-powered chatbot designed for the JobsForHer Foundation to assist w
 
 - **Rasa Open Source**: For natural language understanding and dialogue management
 - **Python 3.9**: Core programming language
-- **HTML/CSS/JavaScript**: Web interface with Rasa Chat Widget
+- **HTML/CSS/JavaScript**: Web interface with custom chat widget
 - **CSV/JSON**: Data storage for job listings and session information
+
+## Recent Updates
+
+- **Improved Job Search**: Enhanced contextual understanding of job search queries
+- **Fixed Slot Persistence**: Location and experience values are now retained when changing job roles
+- **Better Conversation Flow**: Smoother transitions between different conversation topics
+- **Alternative Suggestions**: When no jobs match criteria, the bot now offers helpful alternatives
+- **Enhanced NLU Training**: Better recognition of job roles, locations, and experience levels
 
 ## Project Structure
 
@@ -23,8 +31,13 @@ Asha is an AI-powered chatbot designed for the JobsForHer Foundation to assist w
 asha-chatbot/
 ├── actions/              # Custom actions code
 ├── data/                 # Training data (NLU, stories, rules)
+│   ├── nlu.yml           # Natural language understanding training data  
+│   ├── stories.yml       # Conversation flow stories
+│   ├── rules.yml         # Conversation rules
+│   ├── job_listing_data.csv  # Sample job listings
+│   └── Session Details.json  # Event and session information
 ├── models/               # Trained model files
-├── tests/                # Test stories
+├── tests/                # Test stories and scripts
 ├── config.yml            # NLU and policy configuration
 ├── credentials.yml       # Channel credentials
 ├── domain.yml            # Domain definition
@@ -73,9 +86,20 @@ asha-chatbot/
 
 ## Key Features Implementation
 
-### Job Search
+### Job Search with Context Maintenance
 
-The chatbot uses a form to collect user preferences such as job role, location, and experience. It then searches through available job listings to provide relevant results.
+The chatbot uses a form to collect user preferences such as job role, location, and experience. It maintains context when users refine their search, allowing for natural conversation flow.
+
+```python
+# Example of using a job search form
+- intent: search_job
+- action: job_search_form
+- active_loop: job_search_form
+- active_loop: null
+- action: action_search_jobs
+- intent: provide_job_preference  # User refines search
+- action: action_search_jobs      # Bot updates search with new preferences
+```
 
 ### Gender Bias Handling
 
@@ -88,6 +112,7 @@ Using Rasa's dialogue management capabilities, Asha maintains context throughout
 ## Usage Examples
 
 - "I'm looking for a job in marketing"
+- "Actually, I'm interested in data science roles"
 - "Tell me about upcoming events"
 - "How can I find a mentor?"
 - "What resources do you have for women returning to work?"
@@ -100,6 +125,18 @@ Using Rasa's dialogue management capabilities, Asha maintains context throughout
 - Implement multi-language support
 - Create a mobile app interface
 - Add analytics tracking for conversation insights
+
+## Testing
+
+The repository includes test scripts to verify key functionality:
+
+```bash
+# Run tests for FAQ handling
+python tests/test_faq.py
+
+# Run tests for conversation flows
+python tests/test_conversations.py
+```
 
 ## Contributors
 

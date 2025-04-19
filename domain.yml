@@ -58,6 +58,7 @@ slots:
     influence_conversation: false
     mappings:
     - type: custom
+  
   job_role:
     type: text
     influence_conversation: true
@@ -160,10 +161,18 @@ responses:
   - text: "I'm searching for job opportunities that match your preferences..."
   
   utter_job_results:
-  - text: "Great news! I've found {count} job opportunities that match your criteria. I know job searching can be challenging, but these roles look promising for your skills:\n{job_results}"
+  - text: |-
+      Great news! I've found {count} job opportunities that match your criteria. I know job searching can be challenging, but these roles look promising for your skills:
+      {job_results}
+  - text: |-
+      I've found {count} job opportunities that might interest you:
+      {job_results}
+      
+      Would you like to refine your search criteria or get more details about any of these positions?
   
   utter_no_jobs_found:
   - text: "I understand how frustrating job searching can be. I couldn't find exact matches for your criteria, but don't be discouraged. Would you like to broaden your search a bit? Sometimes a small adjustment can open up many more opportunities."
+  - text: "I don't have any job listings that exactly match your criteria at the moment. Would you like to try different search parameters? You could try a different location, job role, or experience level."
     
   # Event and session responses
   utter_events_info:
@@ -193,6 +202,11 @@ responses:
   # Handling gender bias
   utter_address_gender_bias:
   - text: "At JobsForHer, we believe in equal opportunities and breaking gender stereotypes. Women have proven to excel in every field and role. Would you like to see success stories of women leaders?"
+
+  # Search again response
+  utter_search_again:
+  - text: "Would you like to search for different job opportunities? I can help you find positions with different criteria."
+  - text: "I can search for other job opportunities if you'd like. Just let me know what kind of role you're interested in."
 
 session_config:
   session_expiration_time: 60  # minutes

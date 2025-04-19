@@ -42,6 +42,11 @@ nlu:
     - sounds good
     - that's right
     - i agree
+    - please do
+    - that would be great
+    - yes please
+    - definitely
+    - absolutely
 
 - intent: deny
   examples: |
@@ -55,6 +60,9 @@ nlu:
     - nah
     - not interested
     - i disagree
+    - no thanks
+    - not now
+    - maybe later
 
 - intent: thanks
   examples: |
@@ -66,6 +74,8 @@ nlu:
     - thanks for your help
     - thank you asha
     - thanks for the information
+    - that's helpful, thanks
+    - great, thank you
 
 - intent: mood_great
   examples: |
@@ -133,6 +143,21 @@ nlu:
     - I have [5 years](experience) experience
     - jobs with [python](skill) requirements
     - position requiring [project management](skill) skills
+    - [data science](job_role) roles
+    - [software engineering](job_role) positions
+    - [data scientist](job_role) jobs
+    - [product manager](job_role) openings
+    - [designer](job_role) positions
+    - [marketing](job_role) jobs
+    - any [remote](location) opportunities
+    - [work from home](job_type) positions
+    - jobs for [entry level](experience)
+    - [senior](experience) positions
+    - show me [data science](job_role) jobs
+    - I'm looking for a [software developer](job_role) position
+    - can you find [marketing](job_role) roles
+    - looking for [software engineering](job_role) jobs in [Bangalore](location)
+    - need a [data science](job_role) job in [Mumbai](location)
 
 - intent: list_jobs
   examples: |
@@ -144,6 +169,10 @@ nlu:
     - what jobs do you have
     - list current vacancies
     - tell me about job openings
+    - what roles are available
+    - show me open positions
+    - list the job opportunities
+    - any available jobs
 
 - intent: provide_job_preference
   examples: |
@@ -161,6 +190,19 @@ nlu:
     - I'm looking for a salary of [15 lakhs](salary)
     - I want to work at [Google](company)
     - I prefer [small startups](company)
+    - try [data science](job_role) roles
+    - maybe [software engineering](job_role)
+    - how about [product management](job_role)
+    - what about [remote](location) work
+    - let's try [Delhi](location)
+    - search in [Mumbai](location)
+    - change the location to [Bangalore](location)
+    - change the role to [data scientist](job_role)
+    - I'd prefer [full-time](job_type)
+    - with [python](skill) skills
+    - [react](skill) experience
+    - [machine learning](skill) knowledge
+    - can you search for [data analyst](job_role) positions
 
 # Session and events related intents
 - intent: ask_about_events

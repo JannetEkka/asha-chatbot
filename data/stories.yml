@@ -29,8 +29,8 @@ stories:
   - intent: deny
   - action: utter_goodbye
 
-# Job search stories
-- story: job search with form
+# Job search stories - successful path
+- story: job search with form - success
   steps:
   - intent: greet
   - action: utter_greet
@@ -39,53 +39,66 @@ stories:
   - active_loop: job_search_form
   - active_loop: null
   - action: action_search_jobs
+  - intent: thanks
+  - action: utter_you_are_welcome
 
-- story: job search direct listing
+# Job search stories - failure and refinement
+- story: job search with form - no jobs found - try new role
   steps:
-  - intent: list_jobs
+  - intent: search_job
+  - action: job_search_form
+  - active_loop: job_search_form
+  - active_loop: null
   - action: action_search_jobs
+  - intent: provide_job_preference
+  - action: action_search_jobs
+  - intent: thanks
+  - action: utter_you_are_welcome
 
-# Event and session information stories
-- story: ask about events
+# Event information stories
+- story: ask about events then about mentorship
   steps:
   - intent: ask_about_events
   - action: action_provide_events_info
-
-- story: ask about sessions
-  steps:
-  - intent: ask_about_sessions
-  - action: action_provide_sessions_info
-
-- story: ask about mentorship
-  steps:
   - intent: ask_about_mentorship
   - action: action_provide_mentorship_info
 
-# Women empowerment related stories
-- story: ask about women empowerment
-  steps:
-  - intent: ask_women_empowerment
-  - action: utter_women_empowerment
-
-- story: ask for career advice
-  steps:
-  - intent: ask_career_advice
-  - action: utter_career_advice
-
-# FAQ story
-- story: ask FAQ
+# FAQ and follow-up
+- story: ask FAQ then job search
   steps:
   - intent: faq
   - action: action_handle_faq
+  - intent: search_job
+  - action: job_search_form
+  - active_loop: job_search_form
+  - active_loop: null
+  - action: action_search_jobs
 
-# Goodbye story
-- story: say goodbye
+# Career advice flow
+- story: career advice then goodbye
   steps:
+  - intent: ask_career_advice
+  - action: utter_career_advice
+  - intent: thanks
+  - action: utter_you_are_welcome
   - intent: goodbye
   - action: utter_goodbye
 
-# Bot challenge story
-- story: bot challenge
+# Women empowerment stories
+- story: women empowerment then mentorship
   steps:
-  - intent: bot_challenge
-  - action: utter_iamabot
+  - intent: ask_women_empowerment
+  - action: utter_women_empowerment
+  - intent: ask_about_mentorship
+  - action: action_provide_mentorship_info
+
+# Handle job preferences within job search
+- story: job search and refine preferences
+  steps:
+  - intent: search_job
+  - action: job_search_form
+  - active_loop: job_search_form
+  - active_loop: null
+  - action: action_search_jobs
+  - intent: provide_job_preference
+  - action: action_search_jobs

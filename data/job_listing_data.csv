@@ -1,16 +1,16 @@
 title,company,role,location,job_type,experience,skills,industry
-Senior Software Developer,TechCorp,software developer,Bangalore,full-time,5 years,python java react,IT
-Marketing Manager,BrandX,marketing,Delhi,full-time,3 years,digital marketing social media,Marketing
-Data Analyst,DataInsights,data analyst,Remote,full-time,2 years,python sql tableau,IT
-Product Manager,InnovateTech,product manager,Mumbai,full-time,4 years,agile scrum product strategy,IT
-HR Specialist,PeopleFirst,hr,Hyderabad,full-time,3 years,recruitment employee relations,HR
-Junior Developer,CodeFusion,software developer,Bangalore,part-time,1 year,javascript html css,IT
-Content Writer,ContentHub,content writer,Remote,freelance,2 years,copywriting seo blog writing,Media
-Finance Analyst,MoneyMatters,finance analyst,Delhi,full-time,3 years,financial modeling excel accounting,Finance
-UX Designer,DesignWorks,designer,Pune,full-time,2 years,figma user research ui design,IT
-Project Coordinator,ProjectPro,project manager,Chennai,contract,2 years,project coordination jira,IT
-Women's Leadership Program Manager,EmpowerHer,leadership,Bangalore,full-time,5 years,program management leadership development,Non-profit
-Return to Work Coach,CareerRestart,career counselor,Remote,part-time,4 years,coaching career guidance,HR
-Diversity and Inclusion Specialist,InclusiveCorp,diversity specialist,Mumbai,full-time,3 years,dei program management training,HR
-Social Media Manager,DigitalPulse,social media,Delhi,full-time,2 years,content creation social media management,Marketing
-Community Manager,TechWomen,community manager,Remote,full-time,2 years,community building event management,IT
+Senior Software Engineer,TechCorp,software developer,Bangalore,full-time,5,python java react,IT
+Junior Software Developer,InnoTech,software developer,Bangalore,full-time,2,javascript python,IT
+Frontend Developer,WebSolutions,software developer,Mumbai,full-time,3,react javascript html css,IT
+Backend Engineer,CloudSystems,software developer,Delhi,full-time,4,java spring aws,IT
+Data Scientist,AnalyticsPro,data science,Bangalore,full-time,3,python pandas scikit-learn,IT
+Senior Data Analyst,DataInsights,data science,Mumbai,full-time,5,python r tableau sql,IT
+Machine Learning Engineer,AIInnovate,data science,Bangalore,full-time,4,python tensorflow keras,IT
+Product Manager,ProductLabs,product manager,Delhi,full-time,6,agile product-management,IT
+UX Designer,DesignWorks,designer,Bangalore,full-time,3,figma sketch user-research,IT
+Marketing Specialist,BrandX,marketing,Mumbai,full-time,2,social-media content-marketing,Marketing
+HR Manager,PeopleFirst,hr manager,Hyderabad,full-time,5,recruitment talent-management,Human Resources
+Remote Software Engineer,RemoteTech,software developer,Remote,full-time,4,python django react,IT
+Part-time Web Developer,FlexiTech,software developer,Bangalore,part-time,2,html css javascript,IT
+Data Engineer,BigData Inc,data engineer,Delhi,full-time,3,sql hadoop spark,IT
+DevOps Engineer,InfraCloud,devops engineer,Bangalore,full-time,4,docker kubernetes aws,IT

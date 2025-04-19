@@ -2,10 +2,10 @@ import tarfile
 import os
 
 # Specify the exact path to your tar.gz file
-file_path = "D:/Projects/asha-chatbot/models/20250419-203316-mature-shrike.tar.gz"
+file_path = "D:/Projects/asha-chatbot/src/models/20250420-043225-convex-unit.tar.gz"
 
 # Create extraction directory
-extract_dir = "D:/Projects/asha-chatbot/src/models/mature-shrike"
+extract_dir = "D:/Projects/asha-chatbot/src/models/convex-unit/"
 os.makedirs(extract_dir, exist_ok=True)
 
 # Extract the tar.gz file
