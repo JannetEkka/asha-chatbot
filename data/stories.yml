@@ -63,6 +63,16 @@ stories:
   - intent: ask_about_mentorship
   - action: action_provide_mentorship_info
 
+# Fix for events follow-up dialog
+- story: ask about events then affirm for more details
+  steps:
+  - intent: ask_about_events
+  - action: action_provide_events_info
+  - intent: affirm
+  - action: action_provide_events_info
+  - intent: thanks
+  - action: utter_you_are_welcome
+
 # FAQ and follow-up
 - story: ask FAQ then job search
   steps:
@@ -102,3 +112,11 @@ stories:
   - action: action_search_jobs
   - intent: provide_job_preference
   - action: action_search_jobs
+
+# Handle gender bias then show interest in technical roles
+- story: address gender bias for tech roles
+  steps:
+  - intent: gender_biased_input
+  - action: action_address_gender_bias
+  - intent: affirm
+  - action: action_provide_sessions_info

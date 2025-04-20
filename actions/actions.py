@@ -1,30 +1,3 @@
-# This files contains your custom actions which can be used to run
-# custom Python code.
-#
-# See this guide on how to implement these action:
-# https://rasa.com/docs/rasa/custom-actions
-
-
-# This is a simple example for a custom action which utters "Hello World!"
-
-# from typing import Any, Text, Dict, List
-#
-# from rasa_sdk import Action, Tracker
-# from rasa_sdk.executor import CollectingDispatcher
-#
-#
-# class ActionHelloWorld(Action):
-#
-#     def name(self) -> Text:
-#         return "action_hello_world"
-#
-#     def run(self, dispatcher: CollectingDispatcher,
-#             tracker: Tracker,
-#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-#
-#         dispatcher.utter_message(text="Hello World!")
-#
-#         return []
 """
 Custom actions for the Asha chatbot.
 """
@@ -223,38 +196,98 @@ class ActionProvideEventsInfo(Action):
                 # Filter for events
                 events = [s for s in session_data if s.get('type') == 'event']
                 
+                # Check for event type in entities
+                event_types = [e["value"] for e in tracker.latest_message.get("entities", []) 
+                              if e["entity"] == "event_type"]
+                
+                # If specific event type requested, filter for it
+                if event_types:
+                    filtered_events = []
+                    for event_type in event_types:
+                        filtered_events.extend([e for e in events if event_type.lower() in e.get('title', '').lower()])
+                    
+                    # If we found specific events, use those; otherwise, fall back to all events
+                    if filtered_events:
+                        events = filtered_events
+                
                 if events:
+                    # Sort events by date
+                    from datetime import datetime
+                    
+                    # Convert date strings to datetime objects for sorting
+                    for event in events:
+                        try:
+                            event['date_obj'] = datetime.strptime(event.get('date', ''), '%B %d, %Y')
+                        except:
+                            # If date can't be parsed, use a far future date
+                            event['date_obj'] = datetime(2099, 12, 31)
+                    
+                    # Sort by date
+                    events.sort(key=lambda x: x['date_obj'])
+                    
+                    # Remove the datetime objects after sorting
+                    for event in events:
+                        del event['date_obj']
+                    
                     # Format the events
                     events_info = "Here are some upcoming events:\n\n"
                     for event in events[:5]:  # Show top 5 events
                         events_info += f"- {event.get('title')} on {event.get('date')} at {event.get('time')}\n"
+                        events_info += f"  {event.get('description')}\n\n"
+                    
+                    events_info += "Would you like more details about any of these events or information about other types of events? You can also browse all events in the 'Events' section of Herkey."
                     
                     dispatcher.utter_message(text=events_info)
                 else:
                     # No events found
-                    dispatcher.utter_message(text="I don't have any upcoming events in my records at the moment. Please check back later or visit our website for the most up-to-date event information.")
+                    dispatcher.utter_message(text="I don't have any upcoming events that match your criteria in my records at the moment. You can check the 'Events' section on Herkey to see all current listings. Would you like to know about our general event categories instead?")
             
             else:
                 # If the data file doesn't exist, use mock data
                 events_info = """Here are some upcoming events:
 
 - Women in Tech Workshop on May 10, 2025 at 2:00 PM
+  Learn about the latest technologies and how women are shaping the tech industry.
+
 - Resume Building Workshop on May 15, 2025 at 3:30 PM
+  Learn how to create a resume that stands out and showcases your skills effectively.
+
 - Career Transition Webinar on May 20, 2025 at 6:00 PM
+  Expert advice on how to successfully navigate career transitions and changes.
+
 - Networking Mixer on May 25, 2025 at 5:00 PM
-- Leadership Skills Workshop on June 1, 2025 at 4:00 PM"""
+  Connect with professionals from various industries and expand your network.
+
+- Leadership Skills Workshop on June 1, 2025 at 4:00 PM
+  Develop essential leadership skills that will help you advance in your career.
+
+Would you like more details about any of these events or information about other types of events? You can view all events in the 'Events' section of Herkey."""
                 
                 dispatcher.utter_message(text=events_info)
                 
         except Exception as e:
+            # Log the error
+            print(f"Error in providing events info: {str(e)}")
+            
             # If there's an error, use mock data
             events_info = """Here are some upcoming events:
 
 - Women in Tech Workshop on May 10, 2025 at 2:00 PM
+  Learn about the latest technologies and how women are shaping the tech industry.
+
 - Resume Building Workshop on May 15, 2025 at 3:30 PM
+  Learn how to create a resume that stands out and showcases your skills effectively.
+
 - Career Transition Webinar on May 20, 2025 at 6:00 PM
+  Expert advice on how to successfully navigate career transitions and changes.
+
 - Networking Mixer on May 25, 2025 at 5:00 PM
-- Leadership Skills Workshop on June 1, 2025 at 4:00 PM"""
+  Connect with professionals from various industries and expand your network.
+
+- Leadership Skills Workshop on June 1, 2025 at 4:00 PM
+  Develop essential leadership skills that will help you advance in your career.
+
+Would you like more details about any of these events or information about other types of events? You can view all events in the 'Events' section of Herkey."""
             
             dispatcher.utter_message(text=events_info)
             
@@ -285,37 +318,83 @@ class ActionProvideSessionsInfo(Action):
                 sessions = [s for s in session_data if s.get('type') == 'session']
                 
                 if sessions:
+                    # Sort sessions by date
+                    from datetime import datetime
+                    
+                    # Convert date strings to datetime objects for sorting
+                    for session in sessions:
+                        try:
+                            session['date_obj'] = datetime.strptime(session.get('date', ''), '%B %d, %Y')
+                        except:
+                            # If date can't be parsed, use a far future date
+                            session['date_obj'] = datetime(2099, 12, 31)
+                    
+                    # Sort by date
+                    sessions.sort(key=lambda x: x['date_obj'])
+                    
+                    # Remove the datetime objects after sorting
+                    for session in sessions:
+                        del session['date_obj']
+                    
                     # Format the sessions
-                    sessions_info = "Here are some upcoming sessions:\n\n"
+                    sessions_info = "Here are some upcoming learning sessions:\n\n"
                     for session in sessions[:5]:  # Show top 5 sessions
                         sessions_info += f"- {session.get('title')} on {session.get('date')} at {session.get('time')}\n"
+                        sessions_info += f"  {session.get('description')}\n\n"
+                    
+                    sessions_info += "These sessions are designed to help you develop various skills relevant to your career. You can check the 'Sessions' section on Herkey to register for these or explore more available sessions."
                     
                     dispatcher.utter_message(text=sessions_info)
                 else:
                     # No sessions found
-                    dispatcher.utter_message(text="I don't have any upcoming sessions in my records at the moment. Please check back later or visit our website for the most up-to-date session information.")
+                    dispatcher.utter_message(text="I don't have any upcoming sessions in my records at the moment. You can check the 'Sessions' section on Herkey to see all current offerings. Our sessions typically cover topics like career growth, technical skills, work-life balance, interviewing, and negotiation.")
             
             else:
                 # If the data file doesn't exist, use mock data
-                sessions_info = """Here are some upcoming sessions:
+                sessions_info = """Here are some upcoming learning sessions:
 
 - Career Growth Strategies on May 12, 2025 at 2:00 PM
+  Learn effective strategies to accelerate your career growth and advancement.
+
 - Technical Skills Update on May 18, 2025 at 3:30 PM
+  Stay updated with the latest technical skills in demand in the job market.
+
 - Work-Life Balance Session on May 22, 2025 at 6:00 PM
+  Tips and strategies for maintaining a healthy work-life balance.
+
 - Interviewing Skills Workshop on May 28, 2025 at 5:00 PM
-- Negotiation Tactics Session on June 5, 2025 at 4:00 PM"""
+  Master the art of interviewing with practical tips and mock interview sessions.
+
+- Negotiation Tactics Session on June 5, 2025 at 4:00 PM
+  Learn effective negotiation strategies for salary discussions and career advancement.
+
+These sessions are designed to help you develop various skills relevant to your career. You can browse and register for these sessions in the 'Sessions' section on Herkey."""
                 
                 dispatcher.utter_message(text=sessions_info)
                 
         except Exception as e:
+            # Log the error
+            print(f"Error in providing sessions info: {str(e)}")
+            
             # If there's an error, use mock data
-            sessions_info = """Here are some upcoming sessions:
+            sessions_info = """Here are some upcoming learning sessions:
 
 - Career Growth Strategies on May 12, 2025 at 2:00 PM
+  Learn effective strategies to accelerate your career growth and advancement.
+
 - Technical Skills Update on May 18, 2025 at 3:30 PM
+  Stay updated with the latest technical skills in demand in the job market.
+
 - Work-Life Balance Session on May 22, 2025 at 6:00 PM
+  Tips and strategies for maintaining a healthy work-life balance.
+
 - Interviewing Skills Workshop on May 28, 2025 at 5:00 PM
-- Negotiation Tactics Session on June 5, 2025 at 4:00 PM"""
+  Master the art of interviewing with practical tips and mock interview sessions.
+
+- Negotiation Tactics Session on June 5, 2025 at 4:00 PM
+  Learn effective negotiation strategies for salary discussions and career advancement.
+
+These sessions are designed to help you develop various skills relevant to your career. You can browse and register for these sessions in the 'Sessions' section on Herkey."""
             
             dispatcher.utter_message(text=sessions_info)
             
@@ -332,17 +411,83 @@ class ActionProvideMentorshipInfo(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         """Provide information about mentorship programs."""
         
-        mentorship_info = """At JobsForHer, we offer various mentorship programs to help women advance in their careers:
+        # Get the latest user message to check for specific questions
+        latest_message = tracker.latest_message.get('text', '').lower()
+        
+        # Check if the query is about finding a mentor
+        if 'find' in latest_message and 'mentor' in latest_message:
+            mentorship_info = """Although Herkey doesn't have a dedicated "Mentorship" section, you can connect with potential mentors through these platform features:
 
-1. One-on-One Mentorship: Get paired with an experienced professional in your field for personalized guidance.
+1. **Network Section**: Browse and connect with professionals in your field. Look for experienced people who might be willing to provide guidance.
 
-2. Group Mentorship Sessions: Join small groups of women with similar career interests for shared learning.
+2. **Groups**: Join industry or skill-specific groups to meet peers and senior professionals who share your interests.
 
-3. Industry-Specific Mentorship: Connect with leaders from specific industries like Tech, Finance, Marketing, etc.
+3. **Sessions & Events**: Participate in sessions and networking events where you can meet potential mentors face-to-face.
 
-4. Return to Work Mentorship: Special programs for women returning to the workforce after a career break.
+4. **Discussions**: Engage in discussions where you can demonstrate your interests and connect with knowledgeable professionals.
 
-Would you like to know more about any specific mentorship program?"""
+When reaching out to potential mentors:
+- Be specific about your goals and what you hope to learn
+- Respect their time by being prepared for conversations
+- Start with a simple coffee chat request before asking for formal mentorship
+
+Would you like tips on how to effectively approach potential mentors?"""
+        
+        # Check if the query is about benefits of mentorship
+        elif 'benefit' in latest_message and 'mentor' in latest_message:
+            mentorship_info = """The benefits of having a mentor include:
+
+1. Personalized guidance from professionals who have successfully navigated similar career paths
+
+2. Insider knowledge about industry trends and opportunities
+
+3. Feedback on your skills, resume, and interview techniques
+
+4. Expanded professional network through your mentor's connections
+
+5. Support for career transitions, whether you're changing fields or returning after a break
+
+6. Increased confidence in your professional abilities and decisions
+
+7. Accountability for your career goals and development
+
+Research shows that professionals with mentors are more likely to receive promotions and report higher job satisfaction. 
+
+You can connect with potential mentors through Herkey's Network, Groups, and by participating actively in Sessions and Discussions."""
+        
+        # Check if the query is about types of mentorship
+        elif 'type' in latest_message and 'mentor' in latest_message:
+            mentorship_info = """There are several types of mentoring relationships you can develop through Herkey's platform:
+
+1. **Peer Mentoring**: Connect with colleagues at similar career stages to share experiences and advice.
+
+2. **Industry Mentoring**: Find leaders in specific industries by participating in industry-focused groups and events.
+
+3. **Skill-Based Mentoring**: Connect with experts in particular skills you want to develop.
+
+4. **Career Transition Mentoring**: Find guidance from professionals who have successfully changed careers or returned to work after breaks.
+
+5. **Leadership Mentoring**: Learn from experienced leaders by engaging with them in sessions and groups focused on leadership.
+
+You can identify potential mentors by actively participating in Herkey's events, joining relevant groups, and making meaningful connections through the Network section.
+
+Which type of mentoring relationship are you most interested in developing?"""
+        
+        # Default response with general mentorship information
+        else:
+            mentorship_info = """Herkey supports your professional growth through various networking and learning opportunities that can lead to meaningful mentoring relationships.
+
+While Herkey doesn't have a dedicated "Mentorship" section, you can connect with potential mentors through:
+
+1. **Network Section**: Connect with experienced professionals in your field who might provide guidance.
+
+2. **Groups**: Join communities of professionals with similar interests where you can meet potential mentors.
+
+3. **Sessions & Events**: Participate in learning sessions and networking events to meet industry experts.
+
+4. **Discussions**: Engage in conversations where you can learn from and connect with knowledgeable professionals.
+
+Professional relationships often develop naturally through regular interaction and engagement on the platform. Would you like to know more about how to effectively approach potential mentors or specific ways to utilize Herkey's features for professional growth?"""
         
         dispatcher.utter_message(text=mentorship_info)
         return []
@@ -367,7 +512,13 @@ class ActionHandleFAQ(Action):
                     category_name = category.get("category", "General")
                     for q_item in category.get("questions", []):
                         question = q_item.get("question", "").lower()
+                        # Replace JobsForHer with Herkey in the questions
+                        question = question.replace("jobsforher", "herkey")
+                        
                         answer = q_item.get("answer", "")
+                        # Replace JobsForHer with Herkey in the answers
+                        answer = answer.replace("JobsForHer", "Herkey")
+                        answer = answer.replace("jobsforher", "herkey")
                         
                         if question and answer:
                             self.all_questions.append(question)
@@ -395,6 +546,9 @@ class ActionHandleFAQ(Action):
         # Get the latest user message
         user_message = tracker.latest_message.get('text', '').lower()
         
+        # Replace JobsForHer with Herkey in the user message
+        user_message = user_message.replace("jobsforher", "herkey")
+        
         # Try to find the closest matching question
         matches = get_close_matches(user_message, self.all_questions, n=1, cutoff=0.6)
         
@@ -419,7 +573,7 @@ class ActionHandleFAQ(Action):
             dispatcher.utter_message(text=f"{intro}{answer}")
         else:
             # Default response if no match is found
-            dispatcher.utter_message(text="I don't have specific information on that. Please try rewording your question, or ask about job opportunities, career advice, or HerKey's services.")
+            dispatcher.utter_message(text="I don't have specific information on that. Please try rewording your question, or ask about job opportunities, career advice, or Herkey's services.")
         
         return []
 
@@ -434,44 +588,39 @@ class ActionAddressGenderBias(Action):
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         """Address gender-biased questions by providing positive information about women in the workplace."""
         
-        # Gender bias patterns to detect
-        gender_bias_patterns = [
-            "women can't", "women are not", "women don't", "women should not",
-            "women inferior", "women weaker", "women less", "women unable",
-            "not suitable for women", "not appropriate for women",
-            "men are better", "men do better", "better than women"
-        ]
-        
-        # Success stories to counter gender bias
-        success_stories = [
-            "Did you know that companies with more women in leadership positions often outperform those with less gender diversity? Research shows diverse teams make better decisions.",
-            
-            "Women leaders like Indra Nooyi (former PepsiCo CEO), Mary Barra (GM CEO), and Kiran Mazumdar-Shaw (Biocon founder) have transformed their industries and proven that women excel in leadership roles.",
-            
-            "Research by McKinsey shows that companies in the top quartile for gender diversity are 25% more likely to have above-average profitability than companies in the bottom quartile.",
-            
-            "NASA's Katherine Johnson, Dorothy Vaughan, and Mary Jackson were essential to the success of U.S. space missions, proving women's capabilities in STEM fields.",
-            
-            "Women entrepreneurs start 40% of businesses in the US, generating $1.8 trillion in revenue annually according to American Express."
-        ]
-        
         # Get the latest user message
         user_message = tracker.latest_message.get('text', '').lower()
         
-        # Check if the message contains gender bias
-        contains_bias = any(pattern in user_message for pattern in gender_bias_patterns)
-        
-        if contains_bias:
-            # Send the default response
-            dispatcher.utter_message(template="utter_address_gender_bias")
+        # Custom responses based on specific biases in the message
+        if "technical" in user_message or "tech" in user_message:
+            response = """That's a misconception I'd like to address! Women have consistently proven their excellence in technical roles across the industry. 
+
+Research from McKinsey shows that companies with gender-diverse technical teams are 21% more likely to experience above-average profitability. Women like Ada Lovelace (the first computer programmer), Grace Hopper (pioneer of COBOL), and Radia Perlman (inventor of STP) revolutionized computing.
+
+Today, leaders like Fei-Fei Li (AI pioneer), Marian Croak (VoIP inventor with 200+ patents), and Reshma Saujani (Girls Who Code founder) continue to drive innovation in tech.
+
+Would you like to hear about specific programs on Herkey that help women build technical skills?"""
             
-            # Also send a success story
-            import random
-            dispatcher.utter_message(text=random.choice(success_stories))
+        elif "leadership" in user_message or "lead" in user_message:
+            response = """I'd like to challenge that perspective! Women have repeatedly demonstrated exceptional leadership capabilities across industries.
+
+Research by Peterson Institute shows companies with 30%+ women in leadership have 15% higher profitability. Leaders like Indra Nooyi (former PepsiCo CEO), Mary Barra (GM CEO), and Kiran Mazumdar-Shaw (Biocon founder) have transformed their industries.
+
+Studies from Harvard Business Review found women leaders score higher in most leadership skills including taking initiative, resilience, and driving results.
+
+Herkey offers resources specifically designed to help women develop leadership skills through sessions and networking opportunities. Would you like me to share some upcoming leadership events?"""
+            
         else:
-            # If not clearly biased, still provide positive information
-            dispatcher.utter_message(template="utter_women_empowerment")
-        
+            # General response if no specific bias is detected
+            response = """I'd like to offer a different perspective! Research consistently shows that gender diversity improves organizational performance across all roles and industries.
+
+A comprehensive study by McKinsey found that companies in the top quartile for gender diversity are 25% more likely to achieve above-average profitability. Women have proven to excel in every field when given equal opportunities and support.
+
+Herkey is dedicated to empowering women in all career paths by providing resources, networking opportunities, and showcasing success stories that break stereotypes and biases.
+
+Would you like to learn about specific success stories of women in your field of interest?"""
+            
+        dispatcher.utter_message(text=response)
         return []
 
 class ValidateJobSearchForm(FormValidationAction):

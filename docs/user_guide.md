@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Welcome to Asha, your AI career assistant from JobsForHer! Asha is designed to help women navigate their career journeys by providing information about job opportunities, community events, mentorship programs, and career resources. This guide will help you understand how to interact with Asha and get the most out of this helpful assistant.
+Welcome to Asha, your AI career assistant from Herkey! Asha is designed to help women navigate their career journeys by providing information about job opportunities, community events, sessions, and career resources. This guide will help you understand how to interact with Asha and get the most out of this helpful assistant.
 
 ## Getting Started
 
@@ -51,13 +51,13 @@ You can also ask about specific types of events:
 - **Example:** "Are there any leadership workshops coming up?"
 - **Example:** "When is the next session about returning to work?"
 
-### Mentorship Programs
+### Networking and Mentorship Opportunities
 
-Asha can guide you through the mentorship opportunities available:
+Asha can guide you through finding networking and mentorship opportunities on Herkey:
 
 - **Example:** "How can I find a mentor?"
-- **Example:** "Tell me about mentorship programs"
-- **Example:** "What are the benefits of having a mentor?"
+- **Example:** "Tell me about networking opportunities"
+- **Example:** "How can I connect with professionals in my field?"
 
 ### Career Resources and Advice
 
@@ -70,12 +70,12 @@ Asha can provide resources and advice for various career situations:
 
 ### Frequently Asked Questions
 
-Asha can answer common questions about JobsForHer:
+Asha can answer common questions about Herkey:
 
-- **Example:** "What is JobsForHer?"
-- **Example:** "Is JobsForHer only for women?"
+- **Example:** "What is Herkey?"
+- **Example:** "Is Herkey only for women?"
 - **Example:** "How do I create an account?"
-- **Example:** "Does JobsForHer charge any fees?"
+- **Example:** "What resources does Herkey provide?"
 
 ## Conversation Tips
 
@@ -128,11 +128,11 @@ If Asha doesn't understand your request or provides an incorrect response:
 - "Tell me about workshops" - Learn about specific event types
 - "When is the next webinar?" - Find out about scheduled webinars
 
-### Mentorship Queries
+### Networking and Mentorship Queries
 
-- "How can I find a mentor?" - Learn about mentorship opportunities
-- "Tell me about mentorship programs" - Get detailed information about programs
-- "How does mentorship work?" - Understand the mentorship process
+- "How can I find a mentor?" - Learn about networking opportunities
+- "Tell me about professional groups" - Get information about groups on Herkey
+- "How can I connect with other professionals?" - Understand networking options
 
 ### Career Advice Queries
 
@@ -184,7 +184,7 @@ For immediate support issues, contact support@herkey.com or use the Help section
 
 ## Conclusion
 
-Asha is designed to be your helpful companion throughout your career journey on the JobsForHer platform. By asking specific questions and providing clear information about your needs, you'll get the most value from your interactions with Asha.
+Asha is designed to be your helpful companion throughout your career journey on the Herkey platform. By asking specific questions and providing clear information about your needs, you'll get the most value from your interactions with Asha.
 
 We hope this guide helps you use Asha effectively! Remember, the more you interact with Asha, the better it can assist you with your career journey.
 
@@ -204,4 +204,4 @@ Asha is fully optimized for mobile devices:
 - Tap quick reply buttons for faster responses
 - Rotate your device for a wider chat view if needed
 
-Thank you for using Asha, your AI career companion from JobsForHer. We wish you success in your professional journey!
+Thank you for using Asha, your AI career companion from Herkey. We wish you success in your professional journey!

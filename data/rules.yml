@@ -99,3 +99,14 @@ rules:
   steps:
   - intent: ask_career_advice
   - action: utter_career_advice
+
+# New rule to handle follow-up on events with an affirmation
+- rule: Follow up on events with yes
+  steps:
+  - intent: affirm
+  - action: action_provide_events_info
+  condition:
+  - active_loop: null
+  - slot_was_set:
+      - requested_slot: null
+  - prev_action_was_action_provide_events_info

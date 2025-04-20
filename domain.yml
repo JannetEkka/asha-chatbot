@@ -136,13 +136,13 @@ responses:
   - text: "I couldn't find a paused conversation to resume."
 
   utter_greet:
-  - text: "Hello! I am Asha, your career assistant from JobsForHer. How can I help you today?"
+  - text: "Hello! I am Asha, your career assistant from Herkey. How can I help you today?"
   
   utter_goodbye:
   - text: "Goodbye! Feel free to come back anytime you need assistance with your career journey."
   
   utter_iamabot:
-  - text: "I am Asha, an AI assistant designed to help women with career information, job opportunities, and empowerment resources."
+  - text: "I am Asha, an AI assistant designed to help women with career information, job opportunities, and empowerment resources from Herkey."
   
   utter_default:
   - text: "I'm sorry, I didn't quite understand that. Could you rephrase or try asking something else about job opportunities or career advice?"
@@ -176,17 +176,17 @@ responses:
     
   # Event and session responses
   utter_events_info:
-  - text: "JobsForHer organizes various events including workshops, webinars, and networking sessions. Would you like to know about upcoming events?"
+  - text: "Herkey organizes various events including workshops, webinars, and networking sessions. Would you like to know about upcoming events?"
   
   utter_sessions_info:
-  - text: "We have various mentorship sessions and learning opportunities available. What type of session are you interested in?"
+  - text: "We have various sessions and learning opportunities available on Herkey. What type of session are you interested in?"
   
   utter_mentorship_info:
-  - text: "Our mentorship programs connect you with experienced professionals who can guide you in your career journey. Would you like to know more about how to join?"
+  - text: "Herkey offers ways to connect with experienced professionals through networking, groups, and events who can guide you in your career journey. Would you like to know more about how to find potential mentors?"
   
   # Women empowerment responses
   utter_women_empowerment:
-  - text: "At JobsForHer, we believe in empowering women in their careers through resources, networking, and opportunities. We provide platforms for women to upskill, return to work after breaks, and advance in their careers."
+  - text: "At Herkey, we believe in empowering women in their careers through resources, networking, and opportunities. We provide platforms for women to upskill, return to work after breaks, and advance in their careers."
   
   utter_career_advice:
   - text: "Building a successful career requires continuous learning, networking, and strategic planning. Would you like specific advice about career advancement, returning to work, or upskilling?"
@@ -197,11 +197,11 @@ responses:
   
   # Out of scope responses
   utter_out_of_scope:
-  - text: "I'm sorry, that's beyond my current capabilities. I'm here to help with job searches, career advice, and information about JobsForHer's programs and events."
+  - text: "I'm sorry, that's beyond my current capabilities. I'm here to help with job searches, career advice, and information about Herkey's programs and events."
   
   # Handling gender bias
   utter_address_gender_bias:
-  - text: "At JobsForHer, we believe in equal opportunities and breaking gender stereotypes. Women have proven to excel in every field and role. Would you like to see success stories of women leaders?"
+  - text: "At Herkey, we believe in equal opportunities and breaking gender stereotypes. Women have proven to excel in every field and role. Would you like to see success stories of women leaders?"
 
   # Search again response
   utter_search_again:
