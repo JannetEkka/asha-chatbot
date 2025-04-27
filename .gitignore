@@ -27,6 +27,7 @@ ENV/
 
 # Rasa
 models/
+src/models/
 extracted_model/
 
 # VSCode
@@ -37,3 +38,4 @@ extracted_model/
 .DS_Store
 .env
 .idea/
+setup_utils.py

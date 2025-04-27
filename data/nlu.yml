@@ -357,3 +357,9 @@ nlu:
     - I don't think women can be good engineers
     - tech is more of a man's world
     - women should focus on non-technical roles
+
+- intent: test_gemini_api
+  examples: |
+    - __test_gemini_api
+    - test gemini api
+    - check api connection

@@ -110,3 +110,8 @@ rules:
   - slot_was_set:
       - requested_slot: null
   - prev_action_was_action_provide_events_info
+
+- rule: Handle test_gemini_api request
+  steps:
+  - intent: test_gemini_api
+  - action: action_test_gemini_api

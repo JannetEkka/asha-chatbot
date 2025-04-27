@@ -4,12 +4,29 @@ Custom actions for the Asha chatbot.
 import os
 import json
 import csv
+import sys
 import pandas as pd
+import logging
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker, FormValidationAction
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.events import SlotSet, FollowupAction, AllSlotsReset
 from difflib import get_close_matches
+from rasa_sdk.events import UserUtteranceReverted
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Try to import HerkeyJobSearch
+try:
+    from utils.herkey_search import HerkeyJobSearch
+    herkey_search_available = True
+    logger.info("Successfully imported HerkeyJobSearch")
+except ImportError:
+    herkey_search_available = False
+    logger.error("Failed to import HerkeyJobSearch - job search will use fallback methods")
 
 class ActionSearchJobs(Action):
     """Action to search for jobs based on user preferences."""
@@ -21,6 +38,30 @@ class ActionSearchJobs(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         """Search for jobs matching user criteria and return results."""
+
+        # Special case for API testing from frontend
+        if tracker.latest_message.get('text', '') == '__test_gemini_api':
+            logger.info("Received test_gemini_api request from frontend")
+            # Test Gemini API connection
+            if herkey_search_available:
+                try:
+                    search_engine = HerkeyJobSearch()
+                    if search_engine.api_key:
+                        logger.info("Gemini API key is present")
+                        # Just make a small test request
+                        try:
+                            test_jobs = search_engine.search_jobs("test", "test", "1")
+                            if test_jobs and len(test_jobs) > 0:
+                                logger.info("Gemini API test successful, working with: " + search_engine.api_key[:5] + "...")
+                        except Exception as e:
+                            logger.error(f"Gemini API test error: {str(e)}")
+                    else:
+                        logger.warning("No Gemini API key found during runtime test")
+                except Exception as e:
+                    logger.error(f"Error initializing HerkeyJobSearch during test: {str(e)}")
+            else:
+                logger.warning("HerkeyJobSearch not available during runtime test")
+            return [UserUtteranceReverted()]
         
         # Get slot values
         job_role = tracker.get_slot("job_role")
@@ -35,11 +76,63 @@ class ActionSearchJobs(Action):
             job_role = 'data science'
         elif 'software' in latest_message and ('engineer' in latest_message or 'engineering' in latest_message or 'developer' in latest_message):
             job_role = 'software developer'
+        elif 'ai' in latest_message and 'engineer' in latest_message:
+            job_role = 'ai engineer'
         
-        # Log the search criteria for debugging
-        print(f"Searching for jobs with criteria: role={job_role}, location={location}, experience={experience}")
+        logger.info(f"Searching for jobs with criteria: role={job_role}, location={location}, experience={experience}")
         
-        # Try to load the job listing data if available
+        # First method: Try to use HerkeyJobSearch class with Gemini API
+        if herkey_search_available:
+            try:
+                # Initialize the search engine
+                search_engine = HerkeyJobSearch()
+                
+                # Check if API key is available
+                if search_engine.api_key:
+                    logger.info("Using Gemini API for job search")
+                    # Perform the search with proper error handling
+                    try:
+                        herkey_jobs = search_engine.search_jobs(job_role, location, experience)
+                        
+                        if herkey_jobs and len(herkey_jobs) > 0:
+                            # Found jobs through API
+                            job_count = len(herkey_jobs)
+                            logger.info(f"Found {job_count} jobs through Gemini API")
+                            
+                            job_results = ""
+                            for job in herkey_jobs:
+                                job_results += f"- {job['title']} at {job['company']} ({job['location']})\n"
+                                if 'type' in job and job['type']:
+                                    job_results += f"  {job['type']}"
+                                if 'posted_date' in job and job['posted_date']:
+                                    job_results += f" | Posted: {job['posted_date']}"
+                                
+                                # Add Apply Now button with proper HTML formatting
+                                job_results += f"\n  [<a href='{job['url']}' target='_blank' class='apply-btn'>Apply Now</a>]\n\n"
+                            
+                            # Log the formatted results for debugging
+                            logger.debug(f"Formatted job results: {job_results[:200]}...")
+                            
+                            # Respond with the results
+                            dispatcher.utter_message(
+                                template="utter_job_results", 
+                                count=job_count, 
+                                job_results=job_results
+                            )
+                            return []
+                        else:
+                            logger.warning("No jobs returned from Gemini API")
+                    except Exception as e:
+                        logger.error(f"Error with Gemini API job search: {str(e)}")
+                else:
+                    logger.warning("Gemini API key not set")
+            except Exception as e:
+                logger.error(f"Error initializing HerkeyJobSearch: {str(e)}")
+        else:
+            logger.warning("HerkeyJobSearch not available")
+    
+        # Second method: Try to load the job listing data if available
+        logger.info("Falling back to CSV job data search")
         job_data = []
         try:
             # Path to the job listing data CSV
@@ -47,11 +140,8 @@ class ActionSearchJobs(Action):
             
             if os.path.exists(data_path):
                 # Read the data
-                import pandas as pd
                 job_data = pd.read_csv(data_path)
-                
-                # Debug: Print first few rows to see the structure
-                print(f"CSV loaded. Found {len(job_data)} jobs. Sample: {job_data.head(2)}")
+                logger.info(f"CSV loaded. Found {len(job_data)} jobs.")
                 
                 # Make all string columns lowercase for case-insensitive comparison
                 for col in job_data.columns:
@@ -82,7 +172,6 @@ class ActionSearchJobs(Action):
                 
                 if experience:
                     # Handle experience as string that might contain numbers
-                    # This is a more flexible approach than exact matching
                     exp_str = str(experience).lower()
                     exp_digits = ''.join(c for c in exp_str if c.isdigit())
                     if exp_digits:
@@ -99,79 +188,98 @@ class ActionSearchJobs(Action):
                 job_count = len(filtered_data)
                 
                 if job_count > 0:
-                    # Take the top 5 jobs to show
-                    top_jobs = filtered_data.head(5)
-                    
+                    # Format the results with apply buttons
                     job_results = ""
-                    for index, job in top_jobs.iterrows():
+                    for _, job in filtered_data.head(5).iterrows():
+                        # Create a job URL slug
+                        job_slug = job['title'].lower().replace(' ', '-')
+                        application_url = f"https://herkey.com/jobs/apply/{job_slug}"
+                        
                         job_results += f"- {job['title']} at {job['company']} ({job['location']})\n"
+                        job_results += f"  [<a href='{application_url}' target='_blank' class='apply-btn'>Apply Now</a>]\n\n"
                     
-                    # Respond with the results
+                    # Send the response
                     dispatcher.utter_message(
                         template="utter_job_results", 
                         count=job_count, 
                         job_results=job_results
                     )
+                    return []
                 else:
-                    # No jobs found - save the new role for future searches
-                    if job_role and job_role != tracker.get_slot("job_role"):
-                        update_slots = [SlotSet("job_role", job_role)]
-                    else:
-                        update_slots = []
-                        
-                    # No jobs found - suggest alternatives
-                    alternative_message = "I couldn't find exact matches for your criteria. "
-                    
-                    if job_role and location:
-                        # Check if there are jobs with this role regardless of location
-                        role_matches = job_data[job_data['role'].str.contains(job_role, case=False, na=False) | 
-                                              job_data['title'].str.contains(job_role, case=False, na=False)]
-                        
-                        if len(role_matches) > 0:
-                            # There are jobs with this role in other locations
-                            alternative_message += f"I found {len(role_matches)} {job_role} positions in other locations. "
-                            alternative_message += "Would you like to search without location restrictions?"
-                        else:
-                            # No jobs with this role at all
-                            alternative_message += f"I don't have any current listings for {job_role} roles. "
-                            alternative_message += "Would you like to try a different role or broaden your search criteria?"
-                    else:
-                        alternative_message += "Would you like to broaden your search criteria or try a different role?"
-                    
-                    dispatcher.utter_message(text=alternative_message)
-                    
-                    return update_slots
-            
+                    logger.warning(f"No jobs found in CSV matching criteria: role={job_role}, location={location}")
             else:
-                # If the data file doesn't exist, use mock data
-                dispatcher.utter_message(
-                    template="utter_job_results",
-                    count="several",
-                    job_results="""- Software Developer at TechCorp (Bangalore)
-- Marketing Manager at BrandX (Delhi)
-- Data Analyst at DataInsights (Remote)
-- Product Manager at InnovateTech (Mumbai)
-- HR Specialist at PeopleFirst (Hyderabad)"""
-                )
+                logger.warning(f"Job listing CSV file not found at {data_path}")
                 
         except Exception as e:
             # Log the exception
-            print(f"Error in job search: {str(e)}")
+            logger.error(f"Error in CSV job search: {str(e)}")
             
-            # If there's an error, use mock data
-            dispatcher.utter_message(
-                template="utter_job_results",
-                count="several",
-                job_results="""- Software Developer at TechCorp (Bangalore)
-- Marketing Manager at BrandX (Delhi)
-- Data Analyst at DataInsights (Remote)
-- Product Manager at InnovateTech (Mumbai)
-- HR Specialist at PeopleFirst (Hyderabad)"""
-            )
-            
+        # As a final fallback, use mock data
+        logger.info("Using mock job data as final fallback")
+        # Create mock job listings with Apply Now buttons
+        job_role_slug = job_role.lower().replace(' ', '-') if job_role else "job"
+        job_title = job_role.title() if job_role else "Software Developer"
+        job_location = location.title() if location else "Bangalore"
+        
+        mock_jobs = [
+            {
+                "title": f"Senior {job_title}",
+                "company": "TechCorp",
+                "location": job_location,
+                "type": "Full-time",
+                "posted_date": "1 week ago",
+                "url": f"https://herkey.com/jobs/apply/{job_role_slug}-senior"
+            },
+            {
+                "title": f"{job_title} - Machine Learning",
+                "company": "Amazon",
+                "location": job_location,
+                "type": "Full-time",
+                "posted_date": "3 days ago",
+                "url": f"https://herkey.com/jobs/apply/{job_role_slug}-machine-learning-amazon"
+            },
+            {
+                "title": f"{job_title} (Retail Analytics)",
+                "company": "Flipkart",
+                "location": job_location,
+                "type": "Full-time",
+                "posted_date": "2 days ago",
+                "url": f"https://herkey.com/jobs/apply/{job_role_slug}-retail-analytics-flipkart"
+            },
+            {
+                "title": f"Applied Scientist",
+                "company": "Microsoft",
+                "location": job_location,
+                "type": "Full-time",
+                "posted_date": "5 days ago",
+                "url": f"https://herkey.com/jobs/apply/applied-scientist-microsoft"
+            },
+            {
+                "title": f"Data Analyst - Business Intelligence",
+                "company": "Accenture",
+                "location": job_location,
+                "type": "Full-time",
+                "posted_date": "1 day ago",
+                "url": f"https://herkey.com/jobs/apply/data-analyst-business-intelligence-accenture"
+            }
+        ]
+        
+        job_results = ""
+        for job in mock_jobs:
+            job_results += f"- {job['title']} at {job['company']} ({job['location']})\n"
+            job_results += f"  {job['type']} | Posted: {job['posted_date']}\n"
+            job_results += f"  [<a href='{job['url']}' target='_blank' class='apply-btn'>Apply Now</a>]\n\n"
+        
+        logger.info("Sending mock job data response")
+        dispatcher.utter_message(
+            template="utter_job_results",
+            count=len(mock_jobs),
+            job_results=job_results
+        )
+        
         # Return empty list as we're not setting any slots
         return []
-
+    
 class ActionProvideEventsInfo(Action):
     """Action to provide information about events."""
 
@@ -803,3 +911,52 @@ class ActionResumeConversation(Action):
         
         # Clear the paused state
         return [SlotSet("paused_state", None)]
+    
+"""
+Special handler for Gemini API test request in actions.py
+This action is triggered when the user sends a specific message to test the Gemini API connection."""
+class ActionTestGeminiAPI(Action):
+    """Action to test Gemini API connection from frontend."""
+
+    def name(self) -> Text:
+        return "action_test_gemini_api"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        """Test Gemini API connection and log results."""
+        
+        logger.info("Received Gemini API test request from frontend")
+        
+        # Try to test Gemini API connection
+        try:
+            # Check if HerkeyJobSearch is available
+            if herkey_search_available:
+                # Initialize the search engine
+                search_engine = HerkeyJobSearch()
+                
+                # Check if API key is available and valid
+                if search_engine.api_key:
+                    logger.info("Gemini API key is available")
+                    
+                    # Make a test request to Gemini API
+                    try:
+                        # Just make a small test request
+                        test_jobs = search_engine.search_jobs("test", "test", "1")
+                        if test_jobs and len(test_jobs) > 0:
+                            logger.info("Gemini API test successful")
+                            # No response needed, just log success
+                        else:
+                            logger.warning("Gemini API test returned no results")
+                    except Exception as e:
+                        logger.error(f"Gemini API test failed: {str(e)}")
+                else:
+                    logger.warning("Gemini API key not available")
+            else:
+                logger.warning("HerkeyJobSearch not available for testing")
+        except Exception as e:
+            logger.error(f"Error in Gemini API test: {str(e)}")
+        
+        # Don't send a response, just return UserUtteranceReverted()
+        # This prevents the bot from responding to the test request
+        return [UserUtteranceReverted()]

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asha Chatbot - JobsForHer Foundation</title>
+    <title>Asha Chatbot - Herkey Foundation</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -48,7 +48,7 @@
         .feature {
             flex-basis: 30%;
             background-color: white;
-            padding: 1.5rem;
+            padding: 1rem;
             margin-bottom: 1.5rem;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
@@ -98,7 +98,7 @@
         /* Styling for chat widget */
         .chat-widget {
             position: fixed;
-            bottom: 20px;
+            bottom: 50px;
             right: 20px;
             z-index: 1000;
         }
@@ -125,7 +125,7 @@
         .chat-window {
             display: none;
             position: fixed;
-            bottom: 90px;
+            bottom: 130px;
             right: 20px;
             width: 350px;
             height: 450px;
@@ -176,8 +176,8 @@
         }
         
         .bot-message {
-            background-color: #8bc34a;
-            color: white;
+            background-color: #f0f0f0;
+            color: #333;
             align-self: flex-start;
             border-bottom-left-radius: 5px;
         }
@@ -221,13 +221,68 @@
             background-color: #cccccc;
             cursor: not-allowed;
         }
+
+        /* Apply Now button styling */
+        .apply-btn {
+            display: inline-block;
+            background-color: #8bc34a;
+            color: white !important;
+            padding: 4px 10px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 5px;
+            font-size: 12px;
+            transition: background-color 0.2s;
+        }
+
+        .apply-btn:hover {
+            background-color: #689f38;
+            text-decoration: none;
+        }
+        
+        /* Styling for response buttons */
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .response-button {
+            background-color: white;
+            color: #935073;
+            border: 1px solid #935073;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 2px;
+        }
+        
+        .response-button:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .typing-indicator {
+            opacity: 0.7;
+        }
+        
+        /* Fix for HTML content in bot messages */
+        .bot-message a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .bot-message a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
             <h1>Asha AI Assistant</h1>
-            <p class="tagline">Your career companion from JobsForHer Foundation</p>
+            <p class="tagline">Your career companion from Herkey</p>
         </div>
     </header>
     
@@ -243,11 +298,11 @@
             </div>
             <div class="feature">
                 <h3>Career Resources</h3>
-                <p>Get guidance on career development, women empowerment initiatives, and frequently asked questions about JobsForHer.</p>
+                <p>Get guidance on career development, women empowerment initiatives, and frequently asked questions about Herkey.</p>
             </div>
         </div>
         
-        <p>Start a conversation with Asha using the chat widget in the bottom-right corner. Ask about job opportunities, career advice, or any questions about the JobsForHer Foundation!</p>
+        <p>Start a conversation with Asha using the chat widget in the bottom-right corner. Ask about job opportunities, career advice, or any questions about the Herkey platform!</p>
         
         <div id="chat-controls" class="chat-controls" style="display: none;">
             <button id="pauseButton" class="control-button" style="display: none;">Pause</button>
@@ -257,7 +312,7 @@
     
     <footer>
         <div class="container">
-            <p>&copy; 2025 JobsForHer Foundation. All rights reserved.</p>
+            <p>&copy; 2025 Herkey. All rights reserved.</p>
         </div>
     </footer>
     
@@ -270,7 +325,7 @@
             <div class="chat-header">
                 <div>
                     <div class="chat-title">Asha - Your Career Assistant</div>
-                    <div class="chat-subtitle">JobsForHer Foundation</div>
+                    <div class="chat-subtitle">Herkey</div>
                 </div>
                 <div class="chat-close" id="chat-close">×</div>
             </div>
@@ -310,7 +365,7 @@
                 
                 // Send greeting message when opening for the first time
                 if (chatMessages.childElementCount === 0) {
-                    sendBotMessage("👋 Hello! I am Asha, your career assistant from JobsForHer. How can I help you today?");
+                    sendBotMessage("👋 Hello! I am Asha, your career assistant from Herkey. How can I help you today?");
                 }
                 
                 // Show pause button
@@ -387,6 +442,8 @@
                 chatMessages.appendChild(typingIndicator);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
+                console.log("Sending message to Rasa:", message);
+                
                 // Send to Rasa REST API
                 fetch('http://localhost:5005/webhooks/rest/webhook', {
                     method: 'POST',
@@ -398,8 +455,13 @@
                         message: message
                     }),
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log("Received response from Rasa:", response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log("Parsed response data:", data);
+                    
                     // Remove typing indicator
                     const indicator = document.getElementById('typing-indicator');
                     if (indicator) chatMessages.removeChild(indicator);
@@ -448,7 +510,7 @@
                     const indicator = document.getElementById('typing-indicator');
                     if (indicator) chatMessages.removeChild(indicator);
                     
-                    console.error('Error:', error);
+                    console.error('Error communicating with Rasa:', error);
                     sendBotMessage("I'm having trouble connecting to my server. Please check your connection and try again.");
                     
                     // Scroll to bottom
@@ -456,43 +518,31 @@
                 });
             }
             
-            // Function to add bot message
+            // Function to add bot message - updated to handle HTML content
             function sendBotMessage(message) {
                 const botMessageElement = document.createElement('div');
                 botMessageElement.className = 'message bot-message';
-                botMessageElement.textContent = message;
+                
+                // Use innerHTML instead of textContent to render HTML elements like links and Apply buttons
+                botMessageElement.innerHTML = message;
+                
+                // Add click handlers for any apply buttons
+                const applyButtons = botMessageElement.querySelectorAll('.apply-btn');
+                applyButtons.forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        // Optional: track application clicks
+                        console.log("User clicked Apply button:", button.href);
+                        
+                        // Open in new window/tab
+                        e.target.setAttribute('target', '_blank');
+                    });
+                });
+                
                 chatMessages.appendChild(botMessageElement);
                 
                 // Scroll to bottom
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
-            
-            // Style for response buttons
-            const buttonStyle = document.createElement('style');
-            buttonStyle.textContent = `
-                .buttons-container {
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 5px;
-                }
-                .response-button {
-                    background-color: white;
-                    color: #935073;
-                    border: 1px solid #935073;
-                    border-radius: 15px;
-                    padding: 5px 10px;
-                    font-size: 12px;
-                    cursor: pointer;
-                    margin: 2px;
-                }
-                .response-button:hover {
-                    background-color: #f0f0f0;
-                }
-                .typing-indicator {
-                    opacity: 0.7;
-                }
-            `;
-            document.head.appendChild(buttonStyle);
         });
     </script>
 </body>

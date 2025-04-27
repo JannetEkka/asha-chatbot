@@ -40,6 +40,8 @@ intents:
   # Gender bias intent
   - gender_biased_input
 
+  - test_gemini_api
+
 entities:
   - job_role
   - job_type
